@@ -20,11 +20,6 @@ export namespace UString {
         if (op?.unit === TimeUnit.Msec) return t;
         return t.substring(0, 14 - (6 - (op?.unit ?? TimeUnit.Sec)) * 2);
     }
-    export function trimProps(obj: any): void {
-        Object.keys(obj)
-            .filter(k => typeof obj[k] === "string")
-            .forEach(k => obj[k] = obj[k]?.trim());
-    }
     export function generateRandomString(len: number): string {
         return int2array(len).map(_ => {
             let rnd = Math.floor(62 * Math.random());
