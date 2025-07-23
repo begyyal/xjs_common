@@ -62,6 +62,11 @@ function test_asPercentage(): void {
     if ((actual = UString.asPercentage(0)) !== "0%" || (actual = UString.asPercentage(null)) !== "")
         throw Error(`[UString.asUsd()] number value was not formatted incorrectly. actual => ${actual}`);
 }
+function test_repeat(): void {
+    let actual = null, expected = null;
+    if ((actual = UString.repeat("ab", 3)) !== (expected = "ababab"))
+        throw Error(`[UString.repeat()] the actual value was inconsistent with the expected. expected => ${expected} / actual => ${actual}`);
+}
 
 export function T_UString(): void {
     test_timeFormatValidations();
@@ -69,5 +74,6 @@ export function T_UString(): void {
     test_asUsd();
     test_asJpy();
     test_asPercentage();
+    test_repeat();
     console.log("tests in T_UString completed.");
 }

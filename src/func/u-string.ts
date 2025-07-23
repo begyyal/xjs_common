@@ -9,6 +9,9 @@ export namespace UString {
     export function eq(s1: string, s2: string): boolean {
         return !UType.isString(s1) || !UType.isString(s2) ? s1 === s2 : s1.trim() === s2.trim();
     }
+    export function repeat(token: string, mlt: number): string {
+        return int2array(mlt).map(_ => token).join("");
+    }
     /**
      * generate date time number as fixed length (depends on `unit`) string without separator charactor.  
      * For example, `2025-06-08T10:15:06.366Z` is to be `20250608101506366`.
