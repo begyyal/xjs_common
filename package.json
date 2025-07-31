@@ -1,6 +1,6 @@
 {
   "name": "xjs-common",
-  "version": "10.1.2",
+  "version": "10.1.3",
   "description": "library modules for typescript that bundled general-purpose implementations.",
   "repository": {
     "type": "git",
