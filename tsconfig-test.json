@@ -1,16 +1,15 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "es2022",
+    "module": "nodenext",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "removeComments": false,
     "experimentalDecorators": true,
     "declaration": false,
-    "outDir": "compiled",
-    "moduleResolution": "node"
+    "outDir": "compiled"
   },
   "include": [
-    "src/index.ts"
+    "src/test/test.ts"
   ]
 }
