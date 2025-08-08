@@ -4,6 +4,8 @@ on:
     paths-ignore:
       - "README.md"
       - ".gitignore"
+      - ".github/workflows/**"
+      - "!.github/workflows/test.yml"
 jobs:
   build:
     runs-on: ubuntu-latest

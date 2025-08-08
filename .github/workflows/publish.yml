@@ -1,7 +1,12 @@
 name: publish
 
-on: workflow_dispatch
-
+on: 
+  workflow_dispatch:
+    inputs:
+      version: 
+        description: 'package version.'
+        required: true
+        type: string
 jobs:
   update-tag:
     runs-on: ubuntu-latest
@@ -10,23 +15,23 @@ jobs:
       id-token: write
     steps:
     - uses: actions/checkout@v4
-    - name: Setup nodejs
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20.x'
-        registry-url: 'https://registry.npmjs.org'
-    - name: Build
-      run: npm ci && npm run build
-    - name: Publish
-      run: npm publish --provenance --access public
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    # - name: Setup nodejs
+    #   uses: actions/setup-node@v4
+    #   with:
+    #     node-version: '20.x'
+    #     registry-url: 'https://registry.npmjs.org'
+    # - name: Build
+    #   run: npm ci && npm run build
+    # - name: Publish
+    #   run: npm publish --provenance --access public
+    #   env:
+    #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     - name: Post tweet
       run: |
-        ./.github/workflows/sh/tweet_template.sh \
-        ${{ github.ref_name }} \
+        ./tool/tweet_template.sh \
+        ${{ inputs.version }} \
         ${{ github.event.repository.html_url }} > ./data_temp
-        ./.github/workflows/sh/tweet.sh \
+        ./tool/sh/tweet.sh \
         ${{ secrets.TW_CONS_KEY }} \
         ${{ secrets.TW_CONS_SECRET }} \
         ${{ secrets.TW_OAUTH_TOKEN }} \
