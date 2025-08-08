@@ -6,9 +6,11 @@
     "esModuleInterop": true,
     "removeComments": false,
     "experimentalDecorators": true,
-    "declaration": false,
+    "emitDeclarationOnly": true,
+    "declaration": true,
     "outDir": "compiled",
-    "moduleResolution": "node"
+    "outFile": "compiled/types.d.ts",
+    "moduleResolution": "bundler"
   },
   "include": [
     "src/index.ts"
