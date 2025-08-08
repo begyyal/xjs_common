@@ -4,7 +4,7 @@
   "description": "library modules for typescript that bundled general-purpose implementations.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/begyyal/xjs_commons"
+    "url": "https://github.com/begyyal/xjs_common"
   },
   "keywords": [
     "javascript",
