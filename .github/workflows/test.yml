@@ -1,13 +1,14 @@
 name: CI
 on: 
   push:
-    paths-ignore:
-      - "README.md"
-      - ".gitignore"
-      - ".github/workflows/**"
-      - "!.github/workflows/test.yml"
+    paths:
+      - "src/**"
+      - "package.json"
+      - "tsconfig.json"
+      - "webpack.config.json"
+      - ".github/workflows/test.yml"
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
