@@ -1,6 +1,6 @@
 {
   "name": "xjs-common",
-  "version": "11.0.1-alpha.1",
+  "version": "11.0.1-alpha.2",
   "description": "library modules for typescript that bundled general-purpose implementations.",
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
     "!/build/test*"
   ],
   "main": "./build/index",
-  "types": "./build/types.d.ts",
+  "types": "./build/index.d.ts",
   "exports": {
     ".": "./build/index"
   },
