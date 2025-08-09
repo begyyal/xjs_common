@@ -6,11 +6,11 @@
     "esModuleInterop": true,
     "removeComments": false,
     "experimentalDecorators": true,
-    "declaration": false,
-    "outDir": "compiled",
-    "moduleResolution": "node"
+    "declaration": true,
+    "outDir": "build",
+    "moduleResolution": "bundler"
   },
   "include": [
-    "src/index.ts"
+    "src/**/*.ts"
   ]
 }
