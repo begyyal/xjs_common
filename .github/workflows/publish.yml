@@ -17,10 +17,18 @@ jobs:
     - name: Setup nodejs
       uses: actions/setup-node@v4
       with:
-        node-version: '20.x'
+        node-version: '22.x'
         registry-url: 'https://registry.npmjs.org'
-    - name: Build
-      run: npm ci && npm run build
+    - name: Build and test
+      run: npm ci && npm run build && npm test
+    - name: Set git configs
+      run: |
+        git config --global user.email "begyyal@gmail.com"
+        git config --global user.name "begyyal-ghost"
+    - name: Push a git tag
+      run: |
+        git tag ${{ inputs.version }}
+        git push origin ${{ inputs.version }}
     - name: Publish
       run: npm publish --provenance --access public
       env:
