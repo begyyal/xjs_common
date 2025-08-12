@@ -29,8 +29,12 @@ export function bitor(...bit: number[]): number {
 export interface RetryOption<T = void | Promise<void>> {
     count?: number;
     logger?: Loggable;
-    errorCriterion?: (e: any) => boolean,
-    intervalPredicate?: () => T
+    errorCriterion?: (e: any) => boolean;
+    intervalPredicate?: () => T;
+};
+export interface SyncRetryOption extends RetryOption<void> { };
+export interface AsyncRetryOption extends RetryOption {
+    intervalSec?: number;
 };
 /**
  * runs callback with customizable retry.
@@ -38,13 +42,14 @@ export interface RetryOption<T = void | Promise<void>> {
  * @param op.count number of retries. default is 1.
  * @param op.logger logger used for exceptions while retrying the process. default is `console` object.
  * @param op.errorCriterion distinguish whether retry is required form exceptions. default is none. (i.e. allways required.)
+ * @param op.intervalSec secounds to wait between callbacks. this wait occurs after `intervalPredicate`.
  * @param op.intervalPredicate predicate that runs between callbacks when retrying.
  */
-export function retry<T>(cb: () => T, op?: RetryOption<void>): T;
-export function retry<T>(cb: () => T, op?: RetryOption<Promise<void>>): Promise<T>;
-export function retry<T>(cb: () => Promise<T>, op?: RetryOption<void>): Promise<T>;
-export function retry<T>(cb: () => Promise<T>, op?: RetryOption<Promise<void>>): Promise<T>;
-export function retry<T>(cb: () => T | Promise<T>, op?: RetryOption): T | Promise<T> {
+export function retry<T>(cb: () => T, op?: SyncRetryOption): T;
+export function retry<T>(cb: () => T, op?: AsyncRetryOption): Promise<T>;
+export function retry<T>(cb: () => Promise<T>, op?: SyncRetryOption): Promise<T>;
+export function retry<T>(cb: () => Promise<T>, op?: AsyncRetryOption): Promise<T>;
+export function retry<T>(cb: () => T | Promise<T>, op?: SyncRetryOption | AsyncRetryOption): T | Promise<T> {
     const l = op?.logger ?? console;
     const initialCount = op?.count ?? 1;
     const handleError = (e: any) => {
@@ -61,9 +66,13 @@ export function retry<T>(cb: () => T | Promise<T>, op?: RetryOption): T | Promis
                     ret.then(resolve).catch((e: any) => { if (handleError(e)) resolve(prcs(c - 1)); else reject(e); }));
             } else return ret;
         };
-        if (c < initialCount && op?.intervalPredicate)
-            ret = op?.intervalPredicate();
-        return ret instanceof Promise ? ret.then(() => innerPrcs()) : innerPrcs();
+        const chain = (c: () => any) => ret instanceof Promise ? ret.then(() => c()) : c();
+        if (c < initialCount) {
+            if (op?.intervalPredicate) ret = op?.intervalPredicate();
+            const intervalSec = (op as AsyncRetryOption)?.intervalSec;
+            if (intervalSec) ret = chain(() => delay(intervalSec));
+        }
+        return chain(innerPrcs);
     };
     return prcs(initialCount);
 }

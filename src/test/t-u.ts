@@ -38,6 +38,17 @@ async function test_retry(): Promise<void> {
     } catch { }
     if (!UArray.eq(array, [0, -1, 1, -1, 2], { sort: false }))
         throw Error("[retry] interval predicate was not working.");
+    cb = () => { throw 0; };
+    array = [Date.now()], ret = null, a = 0;
+    try {
+        ret = await retry(cb, {
+            intervalSec: 0.5,
+            intervalPredicate: () => { array.push(Date.now()); },
+            errorCriterion: e => e === 0, logger: emptyLogger, count: 2
+        });
+    } catch { }
+    if (!(array[2] - array[1] >= 500 && array[1] - array[0] < 500))
+        throw Error("[retry] intervalSec was not working.");
 }
 
 export async function T_U(): Promise<void> {
