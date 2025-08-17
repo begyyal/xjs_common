@@ -37,8 +37,12 @@ export namespace UType {
     function validateProp(k: string, prop: any, td: TypeDesc): string[] {
         if (isEmpty(prop)) return td.req ? [k] : [];
         if (td.t && typeof prop !== td.t) return [k];
-        if (td.ary) return Array.isArray(prop) ? prop.flatMap(e => validateProp(k, e, td.ary)) : [k];
-        if (td.rec) return validate(prop).flatMap(k2 => `${k}.${k2}`);
+        const joinKey = (k2: string) => `${k}.${k2}`;
+        if (td.ary) return Array.isArray(prop)
+            ? prop.flatMap((e, i) => validateProp(i.toString(), e, td.ary)).map(joinKey) : [k];
+        if (td.rcd) return UType.isObject(prop)
+            ? Object.entries(prop).flatMap(e => validateProp(e[0], e[1], td.rcd)).map(joinKey) : [k];
+        if (td.rec) return validate(prop).flatMap(joinKey);
         return [];
     }
     export function takeAsArray<T>(v: MaybeArray<T>): T[] {

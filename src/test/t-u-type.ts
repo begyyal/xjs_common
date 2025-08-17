@@ -29,7 +29,7 @@ function test_validate(): void {
         throw Error("[UType.validate] array decorator was not working. [0]");
     Object.assign(b, { d: ["3"] });
     Object.assign(a, { c: b });
-    if (!UArray.eq(UType.validate(a), ["c.d"]))
+    if (!UArray.eq(UType.validate(a), ["c.d.0"]))
         throw Error("[UType.validate] array decorator was not working. [1]");
     Object.assign(b, { d: [] });
     Object.assign(a, { c: b });

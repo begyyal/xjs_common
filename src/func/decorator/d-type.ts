@@ -6,12 +6,12 @@ import { UObj } from "../u-obj";
 const s_errCode = 30;
 
 export const smbl_tm = Symbol.for("xjs:typeMap");
-export interface TypeDesc {
-    t?: Type;
-    req?: boolean;
-    ary?: TypeDesc;
-    rec?: boolean;
-}
+interface BasicTypeDesc { t?: Type, req?: boolean }
+export interface TypeDesc extends BasicTypeDesc { ary?: TypeDesc, rec?: boolean, rcd?: TypeDesc }
+type ArrayTypeDesc = TypeDesc & { t?: never, rec?: never, rcd?: never };
+type ClassTypeDesc = TypeDesc & { t?: never, ary?: never, rcd?: never };
+type RecordTypeDesc = TypeDesc & { t?: never, arys?: never, rec?: never };
+type AnyTypeDesc = BasicTypeDesc | ArrayTypeDesc | ClassTypeDesc | RecordTypeDesc;
 export interface TypeMap { [k: string]: TypeDesc }
 /** 
  * decorators to be validated by {@link UType.validate},
@@ -36,8 +36,12 @@ export namespace DType {
     export function required(target: Object, propKey: string): void {
         setDesc(target, propKey, (td) => td.req = true);
     }
-    export function array(elmDesc: TypeDesc = {}): (target: Object, propKey: string) => void {
+    export function array(elmDesc: AnyTypeDesc = {}): (target: Object, propKey: string) => void {
         return (target: Object, propKey: string) => setDesc(target, propKey, (td) => td.ary = elmDesc);
+    }
+    /** NOTE: this may allow array type because array is essentialy object type has properties. */
+    export function record(elmDesc: AnyTypeDesc = {}): (target: Object, propKey: string) => void {
+        return (target: Object, propKey: string) => setDesc(target, propKey, (td) => td.rcd = elmDesc);
     }
     export function recursive(target: Object, propKey: string): void {
         setDesc(target, propKey, (td) => td.rec = true);
@@ -47,14 +51,16 @@ export namespace DType {
     }
     function setDesc(target: Object, propKey: string, setter: (td: TypeDesc) => void): void {
         const map: TypeMap = target[smbl_tm] ? Object.assign({}, target[smbl_tm]) : {};
-        map[propKey] ??= { t: null, req: false, rec: false, ary: null };
+        map[propKey] ??= { t: null, req: false, rec: false, ary: null, rcd: null };
         const td = map[propKey];
         setter(td);
-        let ex1 = null, ex2 = null;
-        if (td.t && td.rec) { ex1 = "type"; ex2 = "recursive flag"; }
-        if (td.t && td.ary) { ex1 = "type"; ex2 = "array"; }
-        if (td.ary && td.rec) { ex1 = "array"; ex2 = "recursive flag"; }
-        if (ex1 && ex2) throw new XjsErr(s_errCode, `decorator to express ${ex1} and ${ex2} are exclusive.`);
+        const structualDescs = [[td.ary, "array"], [td.rec, "recursive flag"], [td.rcd, "record"]].filter(e => e[0]);
+        if (structualDescs.length > 0) {
+            let ex1 = null, ex2 = null;
+            if (td.t) { ex1 = "type"; ex2 = structualDescs[0][1]; }
+            if (structualDescs.length > 1) { ex1 = structualDescs[0][1]; ex2 = structualDescs[1][1]; }
+            if (ex1 && ex2) throw new XjsErr(s_errCode, `decorator to express ${ex1} and ${ex2} are exclusive.`);
+        }
         Object.defineProperty(target, smbl_tm, { value: map, configurable: true });
     }
 }
