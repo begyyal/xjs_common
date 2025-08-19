@@ -38,19 +38,23 @@ export namespace UObj {
      * as default if the properties contains object, it also manipulates properties of that recursively.
      * @param o object whose properties the process applies to.
      * @param process process to be applied to properties of the object. note that function property is not included in the properties.
+     * @param op.ignoreEmpty skip null or undefined properties to manipuldate. default is true.
      * @param op.recursive whether it manipulate properties of an object recursively. default is true.
      * @param op.targetType primitive types which filter the properties to be processed.
      */
     export function manipulateProperties<T extends NormalRecord>(
         o: T, process: (v: NonObject) => NonObject, op?: {
+            ignoreEmpty?: boolean,
             recursive?: boolean,
             targetType?: MaybeArray<Exclude<Type, "object" | "null" | "undefined">>,
         }): T {
         const target = op?.targetType && UType.takeAsArray(op?.targetType);
+        const _ignoreEmpty = !UType.isDefined(op?.ignoreEmpty) || op?.ignoreEmpty;
         const _recursive = !UType.isDefined(op?.recursive) || op?.recursive;
         const rec = (_o: object) => {
             for (const k in _o) {
                 const prop = _o[k];
+                if (_ignoreEmpty && UType.isEmpty(prop)) continue;
                 if (UType.isObject(prop) && _recursive) rec(prop);
                 else if (!UType.isFunction(prop) && (!target || target.some(t => typeof prop === t)))
                     _o[k] = process(prop);

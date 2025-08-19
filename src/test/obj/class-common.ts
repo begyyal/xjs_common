@@ -17,6 +17,8 @@ export class CLS_A extends CLS_Base {
     @DType.recursive
     c: CLS_B;
     p: any;
+    @DType.record({ t: Type.number })
+    record: any;
     constructor(
         id?: number,
         a?: number,

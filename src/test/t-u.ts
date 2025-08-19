@@ -1,58 +1,93 @@
-import { Loggable } from "../const/types";
 import { delay, int2array, retry } from "../func/u";
 import { UArray } from "../func/u-array";
+import { s_emptyLogger } from "./const/test-helper";
+import { ModuleTest } from "./prc/module-test";
+import { TestCase } from "./prc/test-case";
+import { TestUnit } from "./prc/test-unut";
 
-function test_int2array(): void {
-    const ary = int2array(3);
-    if (ary.length !== 3 || ![0, 1, 2].every(i => ary[i] === i)) throw Error("[int2array] not working.");
-    const a: any = "3";
-    if (int2array(a).length != 3) throw Error("[int2array] couldn't accept parsable string correctly.");
-}
-async function test_retry(): Promise<void> {
-    const emptyLogger: Loggable = { log: () => { }, warn: () => { }, error: () => { } };
-    let ret = null, a = 0, errorCount = 2;
-    let cb = () => { a += 1; return a; };
-    if (retry(cb, { count: 2, logger: emptyLogger }) !== 1) throw Error("[retry] result value from callback was not returned correctly.");
-    cb = () => { a += 1; if (a <= errorCount) throw Error(); return a; };
-    ret = null, a = 0;
-    try { ret = retry(cb, { count: 2, logger: emptyLogger }); } catch { }
-    if (ret !== 3) throw Error("[retry] callback was not retried by default retryable count correctly.");
-    ret = null, a = 0;
-    try { ret = retry(cb, { logger: emptyLogger }); } catch { /** pass here is correct. */ }
-    if (ret != null) throw Error("[retry] specified retry count was not working.");
-    let cbAsync = async () => { a += 1; await delay(0); if (a <= errorCount) throw 0; return a; };
-    ret = null, a = 0;
-    try { ret = await retry(cbAsync, { count: 2, logger: emptyLogger }); } catch { }
-    if (ret !== 3) throw Error(`[retry] async callback was not working. ret => ${ret}`);
-    ret = null, a = 0;
-    try { ret = await retry(cbAsync, { errorCriterion: e => e > 0, logger: emptyLogger }); } catch { /** pass here is correct. */ }
-    if (ret != null) throw Error("[retry] error criterion was not working.");
-    let array = [];
-    cbAsync = async () => { array.push(a); a += 1; await delay(0); if (a <= errorCount) throw 0; return a; };
-    ret = null, a = 0;
-    try {
-        ret = await retry(cbAsync, {
-            intervalPredicate: async () => { await delay(0); array.push(-1); },
-            errorCriterion: e => e === 0, logger: emptyLogger, count: 2
-        });
-    } catch { }
-    if (!UArray.eq(array, [0, -1, 1, -1, 2], { sort: false }))
-        throw Error("[retry] interval predicate was not working.");
-    cb = () => { throw 0; };
-    array = [Date.now()], ret = null, a = 0;
-    try {
-        ret = await retry(cb, {
-            intervalSec: 0.5,
-            intervalPredicate: () => { array.push(Date.now()); },
-            errorCriterion: e => e === 0, logger: emptyLogger, count: 2
-        });
-    } catch { }
-    if (!(array[2] - array[1] >= 500 && array[1] - array[0] < 500))
-        throw Error("[retry] intervalSec was not working.");
-}
-
-export async function T_U(): Promise<void> {
-    test_int2array();
-    await test_retry();
-    console.log("tests in T_U completed.");
-}
+const mt = new ModuleTest("T_U");
+mt.appendUnit("int2array", function (this: TestUnit) {
+    this.appendCase("basic functionality", function (this: TestCase) {
+        const ary = int2array(3);
+        this.check(ary.length === 3 && [0, 1, 2].every(i => ary[i] === i));
+    });
+    this.appendCase("accept parsable string correctly.", function (this: TestCase) {
+        const a: any = "3";
+        this.check(int2array(a).length === 3);
+    });
+});
+mt.appendUnit("retry", async function (this: TestUnit<{
+    ret: any,
+    counter: number,
+    errorCount: number,
+    array: number[];
+    cb?: () => any,
+    cbAsync?: () => Promise<any>
+}>) {
+    this.chainContextGen(c => ({
+        ret: null,
+        counter: 0,
+        errorCount: 2,
+        array: [],
+        cb: () => { c.counter += 1; return c.counter; }
+    }));
+    this.appendCase("result value from callback was returned correctly.", function (this: TestCase, c) {
+        this.check(retry(c.cb, { count: 2, logger: s_emptyLogger }) === 1);
+    });
+    this.chainContextGen(c => ({
+        cb: () => {
+            c.counter += 1;
+            if (c.counter <= c.errorCount) throw Error();
+            return c.counter;
+        }
+    }));
+    this.appendCase("specified retry count was working.", function (this: TestCase, c) {
+        try { c.ret = retry(c.cb, { count: 2, logger: s_emptyLogger }); } catch { }
+        this.check(c.ret === 3);
+    });
+    this.appendCase("callback was retried by default retryable count correctly.", function (this: TestCase, c) {
+        try { c.ret = retry(c.cb, { logger: s_emptyLogger }); } catch { /** pass here is correct. */ }
+        this.check(c.ret === null);
+    });
+    this.chainContextGen(c => ({
+        cbAsync: async () => {
+            c.array.push(c.counter);
+            c.counter += 1;
+            await delay(0);
+            if (c.counter <= c.errorCount) throw 0;
+            return c.counter;
+        }
+    }));
+    this.appendCase("async callback was working.", async function (this: TestCase, c) {
+        try { c.ret = await retry(c.cbAsync, { count: 2, logger: s_emptyLogger }); } catch { }
+        this.check(c.ret === 3, () => `ret => ${c.ret}`);
+    });
+    this.appendCase("error criterion was working.", async function (this: TestCase, c) {
+        try { c.ret = await retry(c.cbAsync, { errorCriterion: e => e > 0, logger: s_emptyLogger }); } catch { /** pass here is correct. */ }
+        this.check(c.ret === null);
+    });
+    this.appendCase("interval predicate was working.", async function (this: TestCase, c) {
+        try {
+            c.ret = await retry(c.cbAsync, {
+                intervalPredicate: async () => { await delay(0); c.array.push(-1); },
+                errorCriterion: e => e === 0, logger: s_emptyLogger, count: 2
+            });
+        } catch { }
+        this.check(UArray.eq(c.array, [0, -1, 1, -1, 2], { sort: false }));
+    });
+    this.chainContextGen(() => ({
+        cb: () => { throw 0; },
+        array: [Date.now()]
+    }));
+    this.appendCase("intervalSec was working.", async function (this: TestCase, c) {
+        try {
+            c.ret = await retry(c.cb, {
+                intervalSec: 0.5,
+                intervalPredicate: () => { c.array.push(Date.now()); },
+                errorCriterion: e => e === 0, logger: s_emptyLogger, count: 2
+            });
+        } catch { }
+        this.check(c.array[2] - c.array[1] >= 500 && c.array[1] - c.array[0] < 500);
+    });
+});
+export const T_U = mt;

@@ -1,79 +1,126 @@
 import { TimeUnit } from "../const/time-unit";
 import { UString } from "../func/u-string";
+import { ModuleTest } from "./prc/module-test";
+import { TestCase } from "./prc/test-case";
+import { TestUnit } from "./prc/test-unut";
 
-function test_timeFormatValidations(): void {
-    if (!UString.is_yyyyMMddhhmmss("20251231235959"))
-        throw Error("[UString.is_yyyyMMddhhmmss] returns false despite of correct format.");
-    if (UString.is_yyyyMMddhhmmss("20251231246060"))
-        throw Error("[UString.is_yyyyMMddhhmmss] false positive.");
-    if (!UString.is_yyyyMMddhhmm("202512312359"))
-        throw Error("[UString.is_yyyyMMddhhmmss] returns false despite of correct format.");
-    if (UString.is_yyyyMMddhhmm("202512312460"))
-        throw Error("[UString.is_yyyyMMddhhmmss] false positive.");
-    if (!UString.is_yyyyMMddhh("2025123123"))
-        throw Error("[UString.is_yyyyMMddhhmmss] returns false despite of correct format.");
-    if (UString.is_yyyyMMddhh("2025123124"))
-        throw Error("[UString.is_yyyyMMddhhmmss] false positive.");
-    if (!UString.is_yyyyMMdd("20251231"))
-        throw Error("[UString.is_yyyyMMddhhmmss] returns false despite of correct format.");
-    if (UString.is_yyyyMMdd("20251200"))
-        throw Error("[UString.is_yyyyMMddhhmmss] false positive.");
-    if (!UString.is_yyyyMM("202512"))
-        throw Error("[UString.is_yyyyMMddhhmmss] returns false despite of correct format.");
-    if (UString.is_yyyyMM("202500"))
-        throw Error("[UString.is_yyyyMMddhhmmss] false positive.");
-    if (!UString.is_yyyy("2025"))
-        throw Error("[UString.is_yyyyMMddhhmmss] returns false despite of correct format.");
-    if (UString.is_yyyy("0025"))
-        throw Error("[UString.is_yyyyMMddhhmmss] false positive.");
-}
-function test_simpleTime(): void {
-    const sec = UString.simpleTime();
-    if (!UString.is_yyyyMMddhhmmss(sec))
-        throw Error(`[UString.simpleTime()] result string's format was incorrectly. ${sec}`);
-    const year = UString.simpleTime({ unit: TimeUnit.Year });
-    if (!UString.is_yyyy(year))
-        throw Error(`[UString.simpleTime()] returned inconsistent string with year time unit. ${year}`);
-}
-function test_asUsd(): void {
-    let actual = null;
-    if ((actual = UString.asUsd(1000000)) !== "$1,000,000")
-        throw Error(`[UString.asUsd()] number value was not formatted incorrectly. actual => ${actual}`);
-    if ((actual = UString.asUsd(11.111)) !== "$11.11")
-        throw Error(`[UString.asUsd()] number value was not formatted incorrectly. actual => ${actual}`);
-    if ((actual = UString.asUsd(0)) !== "$0" || (actual = UString.asUsd(null)) !== "")
-        throw Error(`[UString.asUsd()] number value was not formatted incorrectly. actual => ${actual}`);
-}
-function test_asJpy(): void {
-    let actual = null;
-    if ((actual = UString.asJpy(1000000)) !== "¥1,000,000")
-        throw Error(`[UString.asJpy()] number value was not formatted incorrectly. actual => ${actual}`);
-    if ((actual = UString.asJpy(11.111)) !== "¥11")
-        throw Error(`[UString.asJpy()] number value was not formatted incorrectly. actual => ${actual}`);
-    if ((actual = UString.asJpy(0)) !== "¥0" || (actual = UString.asJpy(null)) !== "")
-        throw Error(`[UString.asJpy()] number value was not formatted incorrectly. actual => ${actual}`);
-}
-function test_asPercentage(): void {
-    let actual = null;
-    if ((actual = UString.asPercentage(1)) !== "100%")
-        throw Error(`[UString.asUsd()] number value was not formatted incorrectly. actual => ${actual}`);
-    if ((actual = UString.asPercentage(0.12345)) !== "12.35%")
-        throw Error(`[UString.asUsd()] number value was not formatted incorrectly. actual => ${actual}`);
-    if ((actual = UString.asPercentage(0)) !== "0%" || (actual = UString.asPercentage(null)) !== "")
-        throw Error(`[UString.asUsd()] number value was not formatted incorrectly. actual => ${actual}`);
-}
-function test_repeat(): void {
-    let actual = null, expected = null;
-    if ((actual = UString.repeat("ab", 3)) !== (expected = "ababab"))
-        throw Error(`[UString.repeat()] the actual value was inconsistent with the expected. expected => ${expected} / actual => ${actual}`);
-}
-
-export function T_UString(): void {
-    test_timeFormatValidations();
-    test_simpleTime();
-    test_asUsd();
-    test_asJpy();
-    test_asPercentage();
-    test_repeat();
-    console.log("tests in T_UString completed.");
-}
+const mt = new ModuleTest("T_UString");
+mt.appendUnit("is_yyyyMMddhhmmss", function (this: TestUnit) {
+    this.appendCase("valid format", function (this: TestCase) {
+        this.check(UString.is_yyyyMMddhhmmss("20251231235959"));
+    });
+    this.appendCase("invalid format", function (this: TestCase) {
+        this.check(!UString.is_yyyyMMddhhmmss("20251231246060"));
+    });
+});
+mt.appendUnit("is_yyyyMMddhhmm", function (this: TestUnit) {
+    this.appendCase("valid format", function (this: TestCase) {
+        this.check(UString.is_yyyyMMddhhmm("202512312359"));
+    });
+    this.appendCase("invalid format", function (this: TestCase) {
+        this.check(!UString.is_yyyyMMddhhmm("202512312460"));
+    });
+});
+mt.appendUnit("is_yyyyMMddhh", function (this: TestUnit) {
+    this.appendCase("valid format", function (this: TestCase) {
+        this.check(UString.is_yyyyMMddhh("2025123123"));
+    });
+    this.appendCase("invalid format", function (this: TestCase) {
+        this.check(!UString.is_yyyyMMddhh("2025123124"));
+    });
+});
+mt.appendUnit("is_yyyyMMdd", function (this: TestUnit) {
+    this.appendCase("valid format", function (this: TestCase) {
+        this.check(UString.is_yyyyMMdd("20251231"));
+    });
+    this.appendCase("invalid format", function (this: TestCase) {
+        this.check(!UString.is_yyyyMMdd("20251200"));
+    });
+});
+mt.appendUnit("is_yyyyMM", function (this: TestUnit) {
+    this.appendCase("valid format", function (this: TestCase) {
+        this.check(UString.is_yyyyMM("202512"));
+    });
+    this.appendCase("invalid format", function (this: TestCase) {
+        this.check(!UString.is_yyyyMM("202500"));
+    });
+});
+mt.appendUnit("is_yyyy", function (this: TestUnit) {
+    this.appendCase("valid format", function (this: TestCase) {
+        this.check(UString.is_yyyy("2025"));
+    });
+    this.appendCase("invalid format", function (this: TestCase) {
+        this.check(!UString.is_yyyy("0025"));
+    });
+});
+mt.appendUnit("simpleTime", function (this: TestUnit) {
+    this.appendCase("default format is yyyyMMddhhmmss.", function (this: TestCase) {
+        const sec = UString.simpleTime();
+        this.check(UString.is_yyyyMMddhhmmss(sec), () => sec);
+    });
+    this.appendCase("return as a format according to a time unit option.", function (this: TestCase) {
+        const year = UString.simpleTime({ unit: TimeUnit.Year });
+        this.check(UString.is_yyyy(year), () => year);
+    });
+});
+mt.appendUnit("asUsd", function (this: TestUnit) {
+    this.appendCase("basic functionality", function (this: TestCase) {
+        const usd = UString.asUsd(1000000);
+        this.check(usd === "$1,000,000", () => `actual => ${usd}`);
+    });
+    this.appendCase("handle decimal part.", function (this: TestCase) {
+        const usd = UString.asUsd(11.111);
+        this.check(usd === "$11.11", () => `actual => ${usd}`);
+    });
+    this.appendCase("handle zero.", function (this: TestCase) {
+        const usd = UString.asUsd(0);
+        this.check(usd === "$0", () => `actual => ${usd}`);
+    });
+    this.appendCase("handle null.", function (this: TestCase) {
+        const usd = UString.asUsd(null);
+        this.check(usd === "", () => `actual => ${usd}`);
+    });
+});
+mt.appendUnit("asJpy", function (this: TestUnit) {
+    this.appendCase("basic functionality", function (this: TestCase) {
+        const jpy = UString.asJpy(1000000);
+        this.check(jpy === "¥1,000,000", () => `actual => ${jpy}`);
+    });
+    this.appendCase("remove decimal part.", function (this: TestCase) {
+        const jpy = UString.asJpy(11.111);
+        this.check(jpy === "¥11", () => `actual => ${jpy}`);
+    });
+    this.appendCase("handle zero.", function (this: TestCase) {
+        const jpy = UString.asJpy(0);
+        this.check(jpy === "¥0", () => `actual => ${jpy}`);
+    });
+    this.appendCase("handle null.", function (this: TestCase) {
+        const jpy = UString.asJpy(null);
+        this.check(jpy === "", () => `actual => ${jpy}`);
+    });
+});
+mt.appendUnit("asPercentage", function (this: TestUnit) {
+    this.appendCase("basic functionality", function (this: TestCase) {
+        const actual = UString.asPercentage(1);
+        this.check(actual === "100%", () => `actual => ${actual}`);
+    });
+    this.appendCase("handle decimal part.", function (this: TestCase) {
+        const actual = UString.asPercentage(0.12345);
+        this.check(actual === "12.35%", () => `actual => ${actual}`);
+    });
+    this.appendCase("handle zero.", function (this: TestCase) {
+        const actual = UString.asPercentage(0);
+        this.check(actual === "0%", () => `actual => ${actual}`);
+    });
+    this.appendCase("handle null.", function (this: TestCase) {
+        const actual = UString.asPercentage(null);
+        this.check(actual === "", () => `actual => ${actual}`);
+    });
+});
+mt.appendUnit("repeat", function (this: TestUnit) {
+    this.appendCase("basic functionality", function (this: TestCase) {
+        const actual = UString.repeat("ab", 3), expected = "ababab";
+        this.check(actual === expected, () => `expected => ${expected} / actual => ${actual}`);
+    });
+});
+export const T_UString = mt;
