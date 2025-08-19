@@ -1,9 +1,7 @@
 
 export * from "./const/types";
 export * from "./const/time-unit";
-export * from "./const/gender";
 export * from "./const/http-method";
-export * from "./const/ccy";
 
 export * from "./func/u";
 export * from "./func/u-obj";
