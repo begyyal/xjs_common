@@ -4,10 +4,13 @@ import { TestUnit } from "./test-unut";
 export class ModuleTest {
     private readonly _units: TestUnit[] = [];
     constructor(readonly name: string) { }
-    appendUnit(unitName: string, cb: (this: TestUnit) => MaybePromise): TestUnit {
+    appendUnit(
+        unitName: string,
+        cb: (this: TestUnit) => void | Promise<void>,
+        op?: { concurrent?: boolean }): TestUnit {
         if (this._units.some(u => u.name === unitName))
             throw Error("duplication of unit name was detected.");
-        const u = new TestUnit(this.name, unitName, cb);
+        const u = new TestUnit(this.name, unitName, cb, op);
         this._units.push(u);
         return u;
     }
