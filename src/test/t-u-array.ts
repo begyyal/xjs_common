@@ -1,3 +1,4 @@
+import { AlmostArray } from "../const/types";
 import { int2array } from "../func/u";
 import { UArray } from "../func/u-array";
 import { genIF_A } from "./func/u";
@@ -65,21 +66,32 @@ mt.appendUnit("distinct", function (this: TestUnit<{
 mt.appendUnit("eq", function (this: TestUnit<{
     array1: number[],
     array2: number[],
-    array3: number[]
+    array3: number[],
+    aa: AlmostArray,
 }>) {
     this.chainContextGen(_ => ({
         array1: [1, 2, 3],
         array2: [1, 3, 2],
-        array3: []
+        array3: [],
+        aa: new Uint8Array([1, 2, 3, 4, 5])
     }));
     this.appendCase("basic functionality", function (this: TestCase, c) {
-        this.check(UArray.eq(c.array1, c.array1) && UArray.eq(null, undefined) && !UArray.eq(c.array1, c.array3));
+        this.check(UArray.eq(c.array1, c.array1) && !UArray.eq(c.array1, c.array3));
+    });
+    this.appendCase("consider empty values as the same.", function (this: TestCase, c) {
+        this.check(UArray.eq(null, undefined));
+    });
+    this.appendCase("has type compatibility to AlmostArray.", function (this: TestCase, c) {
+        this.check(UArray.eq(c.aa, c.aa));
     });
     this.appendCase("sort flag works as default.", function (this: TestCase, c) {
         this.check(UArray.eq(c.array1, c.array2));
     });
     this.appendCase("useStrictEqual option works.", function (this: TestCase, c) {
         this.check(UArray.eq(c.array1, ["1", "2", "3"], { useStrictEqual: false }));
+    });
+    this.appendCase("useStrictEqual option works with AlmostArray.", function (this: TestCase, c) {
+        this.check(UArray.eq(c.aa, [1, 2, 3, 4, 5], { useStrictEqual: false }));
     });
     this.appendCase("sort option works as false.", function (this: TestCase, c) {
         this.check(!UArray.eq(c.array1, c.array2, { sort: false }));
@@ -115,6 +127,17 @@ mt.appendUnit("shuffle", function (this: TestUnit<{
     });
     this.appendCase("basic functionality", function (this: TestCase, c) {
         this.check(!UArray.eq(c.ret, c.array, { sort: false }));
+    });
+});
+mt.appendUnit("chop", function (this: TestUnit) {
+    this.appendCase("basic functionality", function (this: TestCase) {
+        const actual = UArray.chop([1, 2, 3, 4, 5], 2);
+        this.check(actual.toString() === [[1, 2], [3, 4], [5]].toString());
+    });
+    this.appendCase("has type compatibility to AlmostArray.", function (this: TestCase) {
+        const actual = Array.from(UArray.chop(new Uint8Array([1, 2, 3, 4, 5]), 2).values());
+        const expected = [new Uint8Array([1, 2]), new Uint8Array([3, 4]), new Uint8Array([5])];
+        this.check(actual.toString() === expected.toString());
     });
 });
 export const T_UArray = mt;
