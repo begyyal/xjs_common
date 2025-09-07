@@ -1,4 +1,5 @@
 
+export type Ctor<T = any> = { new(): T };
 export type IndexSignature = string | number | symbol;
 export type NormalRecord<T = any> = Record<IndexSignature, T>;
 export type MaybeArray<T = any> = T | T[];

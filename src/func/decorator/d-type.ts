@@ -1,4 +1,4 @@
-import { Type } from "../../const/types";
+import { Ctor, Type } from "../../const/types";
 import { XjsErr } from "../../obj/xjs-err";
 import { UType } from "../u-type";
 import { UObj } from "../u-obj";
@@ -6,12 +6,7 @@ import { UObj } from "../u-obj";
 const s_errCode = 30;
 
 export const smbl_tm = Symbol.for("xjs:typeMap");
-interface BasicTypeDesc { t?: Type, req?: boolean }
-export interface TypeDesc extends BasicTypeDesc { ary?: TypeDesc, rec?: boolean, rcd?: TypeDesc }
-type ArrayTypeDesc = TypeDesc & { t?: never, rec?: never, rcd?: never };
-type ClassTypeDesc = TypeDesc & { t?: never, ary?: never, rcd?: never };
-type RecordTypeDesc = TypeDesc & { t?: never, arys?: never, rec?: never };
-type AnyTypeDesc = BasicTypeDesc | ArrayTypeDesc | ClassTypeDesc | RecordTypeDesc;
+export interface TypeDesc { t?: Type, req?: boolean, ary?: TypeDesc, rcd?: TypeDesc, obj?: Ctor }
 export interface TypeMap { [k: string]: TypeDesc }
 /** 
  * decorators to be validated by {@link UType.validate},
@@ -36,25 +31,27 @@ export namespace DType {
     export function required(target: Object, propKey: string): void {
         setDesc(target, propKey, (td) => td.req = true);
     }
-    export function array(elmDesc: AnyTypeDesc = {}): (target: Object, propKey: string) => void {
-        return (target: Object, propKey: string) => setDesc(target, propKey, (td) => td.ary = elmDesc);
+    export function array(elmDesc: TypeDesc | Ctor = {}): (target: Object, propKey: string) => void {
+        return (target: Object, propKey: string) => setDesc(target, propKey,
+            (td) => UType.isFunction(elmDesc) ? td.ary = { obj: elmDesc } : td.ary = elmDesc);
     }
     /** NOTE: this may allow array type because array is essentialy object type has properties. */
-    export function record(elmDesc: AnyTypeDesc = {}): (target: Object, propKey: string) => void {
-        return (target: Object, propKey: string) => setDesc(target, propKey, (td) => td.rcd = elmDesc);
+    export function record(elmDesc: TypeDesc | Ctor = {}): (target: Object, propKey: string) => void {
+        return (target: Object, propKey: string) => setDesc(target, propKey,
+            (td) => UType.isFunction(elmDesc) ? td.rcd = { obj: elmDesc } : td.rcd = elmDesc);
     }
-    export function recursive(target: Object, propKey: string): void {
-        setDesc(target, propKey, (td) => td.rec = true);
+    export function recursive(ctor: Ctor): (target: Object, propKey: string) => void {
+        return (target: Object, propKey: string) => setDesc(target, propKey, (td) => td.obj = ctor);
     }
     export function keep(target: Object, propKey: string): void {
         setDesc(target, propKey, (_) => { });
     }
     function setDesc(target: Object, propKey: string, setter: (td: TypeDesc) => void): void {
         const map: TypeMap = target[smbl_tm] ? Object.assign({}, target[smbl_tm]) : {};
-        map[propKey] ??= { t: null, req: false, rec: false, ary: null, rcd: null };
+        map[propKey] ??= { t: null, req: false, obj: null, ary: null, rcd: null };
         const td = map[propKey];
         setter(td);
-        const structualDescs = [[td.ary, "array"], [td.rec, "recursive flag"], [td.rcd, "record"]].filter(e => e[0]);
+        const structualDescs = [[td.ary, "array"], [td.obj, "recursive"], [td.rcd, "record"]].filter(e => e[0]);
         if (structualDescs.length > 0) {
             let ex1 = null, ex2 = null;
             if (td.t) { ex1 = "type"; ex2 = structualDescs[0][1]; }

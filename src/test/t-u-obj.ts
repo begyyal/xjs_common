@@ -1,10 +1,8 @@
 import { Type } from "../const/types";
 import { UObj } from "../func/u-obj";
-import { UString } from "../func/u-string";
-import { UType } from "../func/u-type";
 import { genCLS_A, genIF_A, genIF_B } from "./func/u";
-import { CLS_A } from "./obj/class-common";
-import { IF_A, IF_B } from "./obj/if-common";
+import { CLS_A, CLS_B, CLS_C } from "./obj/class-common";
+import { IF_A, IF_B, IF_C } from "./obj/if-common";
 import { ModuleTest } from "./prc/module-test";
 import { TestCase } from "./prc/test-case";
 import { TestUnit } from "./prc/test-unut";
@@ -33,11 +31,13 @@ mt.appendUnit("assignProperties", function (this: TestUnit<{
             const b = { id: 1, a: 2, b: "3", c: { id: 11, d: [1], e: "bad" } };
             return UObj.assignProperties(genCLS_A(1)[0], b, null, keep);
         };
-        this.check(UType.validate(assign4keepOption(false)).length === 0 && UType.validate(assign4keepOption(true)).length > 0);
+        this.check(!((assign4keepOption(false).c as any) instanceof CLS_B));
+        this.check((assign4keepOption(true).c as any) instanceof CLS_B)
     });
 });
 mt.appendUnit("crop", function (this: TestUnit<{
-    class_a: CLS_A
+    class_a: CLS_A,
+    redundant_a: { id: number, a: number, aa: number }
 }>) {
     this.chainContextGen(_ => ({ class_a: genCLS_A(1)[0] }));
     this.appendCase("basic functionality", function (this: TestCase, c) {
@@ -54,6 +54,24 @@ mt.appendUnit("crop", function (this: TestUnit<{
     });
     this.appendCase("no error when recursive property is null.", function (this: TestCase, c) {
         c.class_a.c = null; UObj.crop(c.class_a);
+    });
+    this.clearContextGen();
+    this.chainContextGen(_ => ({ redundant_a: { id: 1, a: 1, aa: 1 } }))
+    this.appendCase("crop properties of non class object with ctor.", function (this: TestCase, c) {
+        const cropped = UObj.crop(c.redundant_a, CLS_A);
+        this.check(cropped.a && !cropped.aa);
+    });
+    this.appendCase("crop properties of non class object with ctor recursively.", function (this: TestCase, c) {
+        const oc: IF_C = {
+            cls: c.redundant_a,
+            rcd: { a: Object.assign({}, c.redundant_a) },
+            ary: [Object.assign({}, c.redundant_a)]
+        };
+        const cropped = UObj.crop(oc, CLS_C);
+        const checkA = (oa: { a: number, aa: number }) => this.check(oa.a && !oa.aa);
+        checkA(cropped.cls);
+        checkA(cropped.rcd.a);
+        checkA(cropped.ary[0]);
     });
 });
 mt.appendUnit("manipulateProperties", function (this: TestUnit<{

@@ -1,4 +1,4 @@
-import { MaybeArray, Type } from "../const/types";
+import { Ctor, MaybeArray, Type } from "../const/types";
 import { smbl_tm, TypeMap, DType, TypeDesc } from "./decorator/d-type";
 
 export namespace UType {
@@ -26,13 +26,15 @@ export namespace UType {
         return Array.isArray(v) && (!t || v.every(e => typeof e === t));
     }
     /** 
-     * validate properties which attached decorators in {@link DType}.
-     * @param o object to be validated.
+     * validate properties decorated with {@link DType}.
+     * @param o object to be validated. if this is class object decorated with {@link DType}, it can omits `ctor` parameter.
+     * @param ctor class constructor type whose properties are decorated.
      * @returns invalid property keys. returns an empty array if `o` is valid.
      */
-    export function validate(o: any): string[] {
-        if (!o[smbl_tm]) return [];
-        return Object.entries(o[smbl_tm] as TypeMap).flatMap(e => validateProp(e[0], o[e[0]], e[1]));
+    export function validate(o: any, ctor?: Ctor): string[] {
+        const _o = (!ctor || o instanceof ctor) ? o : Object.assign(new ctor(), o);
+        if (!_o[smbl_tm]) return [];
+        return Object.entries(_o[smbl_tm] as TypeMap).flatMap(e => validateProp(e[0], _o[e[0]], e[1]));
     }
     function validateProp(k: string, prop: any, td: TypeDesc): string[] {
         if (isEmpty(prop)) return td.req ? [k] : [];
@@ -42,7 +44,7 @@ export namespace UType {
             ? prop.flatMap((e, i) => validateProp(i.toString(), e, td.ary)).map(joinKey) : [k];
         if (td.rcd) return UType.isObject(prop)
             ? Object.entries(prop).flatMap(e => validateProp(e[0], e[1], td.rcd)).map(joinKey) : [k];
-        if (td.rec) return validate(prop).flatMap(joinKey);
+        if (td.obj) return validate(prop, td.obj).flatMap(joinKey);
         return [];
     }
     export function takeAsArray<T>(v: MaybeArray<T>): T[] {

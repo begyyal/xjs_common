@@ -1,7 +1,8 @@
 import { Type } from "../const/types";
 import { UArray } from "../func/u-array";
 import { UType } from "../func/u-type";
-import { CLS_A, CLS_B } from "./obj/class-common";
+import { CLS_A, CLS_B, CLS_C } from "./obj/class-common";
+import { IF_C } from "./obj/if-common";
 import { ModuleTest } from "./prc/module-test";
 import { TestCase } from "./prc/test-case";
 import { TestUnit } from "./prc/test-unut";
@@ -81,6 +82,17 @@ mt.appendUnit("validate", function (this: TestUnit<{
     this.appendCase("record decorator accepts a valid object.", function (this: TestCase, c) {
         Object.assign(c.class_a, { record: { a: 1, b: 2 } });
         this.check(UType.validate(c.class_a).length === 0);
+    });
+    this.clearContextGen();
+    this.appendCase("validate non class object with ctor.", function (this: TestCase) {
+        this.check(UArray.eq(UType.validate({}, CLS_A), ["id"]));
+    });
+    this.appendCase("validate non class properties with ctor.", function (this: TestCase) {
+        const o1: IF_C = { cls: {}, rcd: { a: {} }, ary: [{}] };
+        const actual = UType.validate(o1, CLS_C);
+        this.check(UArray.eq(actual, ["cls.id", "rcd.a.id", "ary.0.id"]), () => actual.toString());
+        const o2: IF_C = { cls: { id: 1 }, rcd: { a: { id: 1 } }, ary: [{ id: 1 }] };
+        this.check(UType.validate(o2, CLS_C).length === 0);
     });
 });
 mt.appendUnit("isArray", function (this: TestUnit<{

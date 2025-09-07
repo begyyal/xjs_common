@@ -1,4 +1,4 @@
-import { MaybeArray, NonObject, NormalRecord, Type } from "../const/types";
+import { Ctor, IndexSignature, MaybeArray, NonObject, NormalRecord, Type } from "../const/types";
 import { DType, smbl_tm, TypeMap } from "./decorator/d-type";
 import { UType } from "./u-type";
 
@@ -19,17 +19,33 @@ export namespace UObj {
         return t;
     }
     /**
-     * crop properties of the object. the properties is removed with `delete` operator.
-     * @param o object whose properties is removed.
-     * @param keys property names to be remained. if omit this, it removes the properties other than properties decorated {@link DType}.
-     * @param exclusive if true, it removes `keys` instead of remaining it.
+     * crop properties of the object other than specified. the properties are to be removed with `delete` operator.
+     * @param o object whose properties to be removed.
+     * @param keys property names to be remained.
+     * @param removeKeys if true, it removes `keys` instead of remaining it.
      */
-    export function crop<T extends NormalRecord>(o: T, keys?: (keyof T)[], exclusive?: boolean): Partial<T> {
-        if (!keys && !o[smbl_tm]) return {};
-        const _keys = keys ?? Object.keys(o[smbl_tm]);
+    export function crop<T extends NormalRecord>(o: T, keys: (keyof T)[], removeKeys?: boolean): Partial<T>;
+    /**
+     * crop properties that is not decorated with {@link DType}. the properties will be removed with `delete` operator. 
+     * this treats constructual decorator such as {@link DType.recursive} recursively.
+     * @param o object whose properties to be removed. if this is class object decorated with {@link DType}, it can omits `ctor` parameter.
+     * @param ctor class constructor type whose properties are decorated with {@link DType}.
+     */
+    export function crop<T extends NormalRecord>(o: T, ctor?: Ctor): Partial<T>;
+    export function crop<T extends NormalRecord>(o: T, keys_or_ctor?: (keyof T)[] | Ctor, removeKeys?: boolean): Partial<T> {
+        const tm: TypeMap = Array.isArray(keys_or_ctor) ? null
+            : (!keys_or_ctor || o instanceof keys_or_ctor ? o[smbl_tm] : new keys_or_ctor()[smbl_tm]);
+        const _keys = tm ? Object.keys(tm) : (keys_or_ctor as IndexSignature[] ?? []);
+        if (_keys.length === 0) return removeKeys ? o : {};
         Object.keys(o).filter(k => {
-            if (!keys && (o[smbl_tm] as TypeMap)?.[k]?.rec && o[k]) crop(o[k]);
-            return !!exclusive === _keys.includes(k);
+            if (tm && tm[k] && o[k]) {
+                if (tm[k].obj) crop(o[k], tm[k]?.obj);
+                else {
+                    const vCtor = tm[k].ary?.obj ?? tm[k].rcd?.obj;
+                    Object.values(o[k]).forEach(v => crop(v, vCtor));
+                }
+            }
+            return !!removeKeys === _keys.includes(k);
         }).forEach(k => delete o[k]);
         return o;
     }
