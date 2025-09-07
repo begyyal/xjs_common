@@ -27,6 +27,7 @@ import { delay, int2array, UHttp, retry, MaybeArray, Loggable } from "xjs-common
     retry(async () => { }, { count: 2 });
 
     // utility types
+    let dateCtor: Ctor = Date; // constructor type like class type.
     let maybeArray: MaybeArray<number> = 0; // also number array is applicable.
     let logger: Loggable = console; // object implements log/warn/error is applicable.
 
@@ -124,18 +125,8 @@ this flag is true by default at the target higher than `ES2022`, [here is for mo
 ```ts
 import { Type, DType, UType, UObj } from "xjs-common";
 
-class Cls_A {
-    @DType.required
-    @DType.number
-    id: number;
-    @DType.string
-    strA: string;
-    @DType.recursive
-    objA: Cls_B;
-    p: number;
-    constructor() { }
-}
-class Cls_B {
+interface If_B { aryB: number[], boolB: boolean, q: number }
+class Cls_B implements If_B {
     @DType.array({ t: Type.number })
     aryB: number[];
     @DType.boolean
@@ -143,37 +134,51 @@ class Cls_B {
     q: number;
     constructor() { }
 }
+interface If_A { id: number, strA: string, objA: If_B, p: number }
+class Cls_A implements If_A {
+    @DType.required
+    @DType.number
+    id: number;
+    @DType.string
+    strA: string;
+    @DType.recursive(Cls_B)
+    objA: If_B;
+    p: number;
+    constructor(substance?: If_A) { Object.assign(this, substance); }
+}
 (() => {
-    const valid_b1 = Object.assign(new Cls_B(), { aryB: [1, 2, 3], boolB: true, q: 1 });
-    const valid1 = Object.assign(new Cls_A(), { id: 1, strA: "a", objA: valid_b1, p: 1 });
+    const valid_b1: If_B = { aryB: [1, 2, 3], boolB: true, q: 1 };
+    const valid_a1: If_A = { id: 1, strA: "a", objA: valid_b1, p: 1 };
 
     // remove non decorated fields.
-    const cropped = UObj.crop(valid1);
-    console.log(!!cropped.id && !cropped.p && !!cropped.objA.aryB && !cropped.objA.q) // true;
+    const cropped = UObj.crop(valid_a1, Cls_A);
+    console.log(!!cropped.id && !cropped.p); // true;
+    console.log(!!cropped.objA.aryB && !cropped.objA.q); // true
+
+    // passing class object instead of ctor is allowed.
+    UObj.crop(new Cls_A(valid_a1));
 
     // validation. below are valid cases.
-    console.log(UType.validate(valid1)); // []
-
-    const valid2 = { id: 0 };
-    console.log(UType.validate(Object.assign(new Cls_A(), valid2))); // []
+    console.log(UType.validate({ id: 0 }, Cls_A)); // []
+    console.log(UType.validate(valid_a1, Cls_A)); // []
 
     // validation. below are invalid cases.
     const invalid1 = {};
-    console.log(UType.validate(Object.assign(new Cls_A(), invalid1))); // [ 'id' ]
+    console.log(UType.validate(invalid1, Cls_A)); // [ 'id' ]
 
-    const invalid3 = { id: 0, strA: [], objA: valid_b1 };
-    console.log(UType.validate(Object.assign(new Cls_A(), invalid3))); // [ 'strA' ]
+    const invalid2 = { id: 0, strA: [], objA: valid_b1 };
+    console.log(UType.validate(invalid2, Cls_A)); // [ 'strA' ]
 
-    const invalid4 = { id: "0", strA: "a", objA: valid_b1 };
-    console.log(UType.validate(Object.assign(new Cls_A(), invalid4))); // [ 'id' ]
+    const invalid3 = { id: "0", strA: "a", objA: valid_b1 };
+    console.log(UType.validate(invalid3, Cls_A)); // [ 'id' ]
 
-    const invalid_b1 = Object.assign(new Cls_B(), { aryB: [1, 2, 3], boolB: 1 });
-    const invalid5 = { id: 0, strA: "a", objA: invalid_b1 };
-    console.log(UType.validate(Object.assign(new Cls_A(), invalid5))); // [ 'objA.boolB' ]
+    const invalid_b1 = { aryB: [1, 2, 3], boolB: 1 };
+    const invalid4 = { id: 0, strA: "a", objA: invalid_b1 };
+    console.log(UType.validate(invalid4, Cls_A)); // [ 'objA.boolB' ]
 
-    const invalid_b2 = Object.assign(new Cls_B(), { aryB: ["1"], boolB: true });
-    const invalid6 = { id: 0, strA: "a", objA: invalid_b2 };
-    console.log(UType.validate(Object.assign(new Cls_A(), invalid6))); // [ 'objA.aryB' ]
+    const invalid_b2 = { aryB: ["1"], boolB: true };
+    const invalid5 = { id: 0, strA: "a", objA: invalid_b2 };
+    console.log(UType.validate(invalid5, Cls_A)); // [ 'objA.aryB.0' ]
 })();
 ```
 # Error definition

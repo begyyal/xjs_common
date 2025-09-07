@@ -29,7 +29,7 @@ export namespace UObj {
      * crop properties that is not decorated with {@link DType}. the properties will be removed with `delete` operator. 
      * this treats constructual decorator such as {@link DType.recursive} recursively.
      * @param o object whose properties to be removed. if this is class object decorated with {@link DType}, it can omits `ctor` parameter.
-     * @param ctor class constructor type whose properties are decorated with {@link DType}.
+     * @param ctor class constructor type whose properties are decorated with {@link DType}. **NOTE** that need to have public constructor without any parameter.
      */
     export function crop<T extends NormalRecord>(o: T, ctor?: Ctor): Partial<T>;
     export function crop<T extends NormalRecord>(o: T, keys_or_ctor?: (keyof T)[] | Ctor, removeKeys?: boolean): Partial<T> {

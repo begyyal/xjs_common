@@ -28,7 +28,7 @@ export namespace UType {
     /** 
      * validate properties decorated with {@link DType}.
      * @param o object to be validated. if this is class object decorated with {@link DType}, it can omits `ctor` parameter.
-     * @param ctor class constructor type whose properties are decorated.
+     * @param ctor class constructor type whose properties are decorated. **NOTE** that need to have public constructor without any parameter.
      * @returns invalid property keys. returns an empty array if `o` is valid.
      */
     export function validate(o: any, ctor?: Ctor): string[] {
