@@ -27,7 +27,7 @@ export namespace UObj {
     export function crop<T extends NormalRecord>(o: T, keys: (keyof T)[], removeKeys?: boolean): Partial<T>;
     /**
      * crop properties that is not decorated with {@link DType}. the properties will be removed with `delete` operator. 
-     * this treats constructual decorator such as {@link DType.recursive} recursively.
+     * this treats constructual decorator such as {@link DType.object} recursively.
      * @param o object whose properties to be removed. if this is class object decorated with {@link DType}, it can omits `ctor` parameter.
      * @param ctor class constructor type whose properties are decorated with {@link DType}. **NOTE** that need to have public constructor without any parameter.
      */
@@ -39,9 +39,9 @@ export namespace UObj {
         if (_keys.length === 0) return removeKeys ? o : {};
         Object.keys(o).filter(k => {
             if (tm && tm[k] && o[k]) {
-                if (tm[k].obj) crop(o[k], tm[k]?.obj);
+                if (tm[k].cls) crop(o[k], tm[k]?.cls);
                 else {
-                    const vCtor = tm[k].ary?.obj ?? tm[k].rcd?.obj;
+                    const vCtor = tm[k].ary?.cls ?? tm[k].rcd?.cls;
                     Object.values(o[k]).forEach(v => crop(v, vCtor));
                 }
             }

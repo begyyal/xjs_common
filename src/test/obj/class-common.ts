@@ -39,7 +39,7 @@ export class CLS_A extends CLS_Base {
     a: number;
     @DType.string
     b: string;
-    @DType.recursive(CLS_B)
+    @DType.object(CLS_B)
     c: CLS_B;
     p: any;
     @DType.record({ t: Type.number })
@@ -59,7 +59,7 @@ export class CLS_A extends CLS_Base {
     }
 }
 export class CLS_C extends CLS_Base implements IF_C {
-    @DType.recursive(CLS_A)
+    @DType.object(CLS_A)
     cls: any;
     @DType.record(CLS_A)
     rcd: Record<string, any>;

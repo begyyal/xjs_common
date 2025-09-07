@@ -141,7 +141,7 @@ class Cls_A implements If_A {
     id: number;
     @DType.string
     strA: string;
-    @DType.recursive(Cls_B)
+    @DType.object(Cls_B)
     objA: If_B;
     p: number;
     constructor(substance?: If_A) { Object.assign(this, substance); }

@@ -44,7 +44,7 @@ export namespace UType {
             ? prop.flatMap((e, i) => validateProp(i.toString(), e, td.ary)).map(joinKey) : [k];
         if (td.rcd) return UType.isObject(prop)
             ? Object.entries(prop).flatMap(e => validateProp(e[0], e[1], td.rcd)).map(joinKey) : [k];
-        if (td.obj) return validate(prop, td.obj).flatMap(joinKey);
+        if (td.cls) return validate(prop, td.cls).flatMap(joinKey);
         return [];
     }
     export function takeAsArray<T>(v: MaybeArray<T>): T[] {
