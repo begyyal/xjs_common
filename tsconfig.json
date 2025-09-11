@@ -1,16 +1,9 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2022",
     "module": "es2022",
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "removeComments": false,
-    "experimentalDecorators": true,
+    "outDir": "build/esm",
     "declaration": true,
-    "outDir": "build",
     "moduleResolution": "bundler"
-  },
-  "include": [
-    "src/**/*.ts"
-  ]
+  }
 }

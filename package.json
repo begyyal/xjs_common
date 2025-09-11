@@ -1,6 +1,6 @@
 {
   "name": "xjs-common",
-  "version": "13.0.0-alpha.2",
+  "version": "13.0.0-alpha.3",
   "description": "library modules for typescript that bundled general-purpose implementations.",
   "repository": {
     "type": "git",
@@ -12,22 +12,28 @@
     "utility"
   ],
   "scripts": {
-    "build": "rm -rdf ./build && tsc",
+    "build": "rm -rdf ./build && tsc && tsc -p ./tsconfig.cjs.json",
     "test": "tsx ./src/test/test.ts"
   },
   "author": "begyyal",
   "license": "Apache-2.0",
   "files": [
     "build",
-    "!/build/test*"
+    "!/build/**/test*"
   ],
-  "main": "./build/index",
-  "types": "./build/index.d.ts",
+  "main": "./build/esm/index.js",
+  "types": "./build/esm/index.d.ts",
   "exports": {
-    ".": [
-      "./build/index.js",
-      "./build/index.d.ts"
-    ]
+    ".": {
+      "import": {
+        "types": "./build/esm/index.ts",
+        "default": "./build/esm/index.js"
+      },
+      "require": {
+        "types": "./build/esm/index.ts",
+        "default": "./build/cjs/index.js"
+      }
+    }
   },
   "devDependencies": {
     "@types/node": "^24.2.1",

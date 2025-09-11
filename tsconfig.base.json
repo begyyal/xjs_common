@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "es2022",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "removeComments": false,
+    "experimentalDecorators": true,
+    "declaration": false
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+}

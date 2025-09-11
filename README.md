@@ -93,32 +93,7 @@ import { UString } from "xjs-common";
     console.log(UString.simpleTime({ date: getJSTDate(), unit: TimeUnit.Day }));
 })();
 ```
-### Mark method as transaction.  
-**NOTE**: this feature uses decorator, so requires `"experimentalDecorators": true` in tsconfig.
-```ts
-import { transaction, delay } from "xjs-common";
-
-class Cls {
-    constructor() { }
-    // default timeout sec is 30.
-    @transaction()
-    async exe1(): Promise<void> {
-    }
-    @transaction({ timeoutSec: 3 })
-    async exe2(): Promise<void> {
-        await delay(10);
-    }
-}
-(async () => {
-    const cls = new Cls();
-    await Promise.all([cls.exe2(), cls.exe2()]);
-})().catch(e => {
-    // reach here after 3 sec from second call for Cls#exe2().
-    // XjsErr [Error]: [XJS] An exclusive process to execute was already running by other request.
-    console.log(e);
-});
-```
-### Validate and crop class fields.  
+### Validate and crop object properties with annotation.  
 **NOTE**: this feature uses decorator, so requires `"experimentalDecorators": true` in tsconfig.  
 **NOTE**: some functionalities  in this feature are based on `"useDefineForClassFields": true` in tsconfig.  
 this flag is true by default at the target higher than `ES2022`, [here is for more](https://www.typescriptlang.org/tsconfig/#useDefineForClassFields).
@@ -180,6 +155,31 @@ class Cls_A implements If_A {
     const invalid5 = { id: 0, strA: "a", objA: invalid_b2 };
     console.log(UType.validate(invalid5, Cls_A)); // [ 'objA.aryB.0' ]
 })();
+```
+### Mark method as transaction.  
+**NOTE**: this feature uses decorator, so requires `"experimentalDecorators": true` in tsconfig.
+```ts
+import { transaction, delay } from "xjs-common";
+
+class Cls {
+    constructor() { }
+    // default timeout sec is 30.
+    @transaction()
+    async exe1(): Promise<void> {
+    }
+    @transaction({ timeoutSec: 3 })
+    async exe2(): Promise<void> {
+        await delay(10);
+    }
+}
+(async () => {
+    const cls = new Cls();
+    await Promise.all([cls.exe2(), cls.exe2()]);
+})().catch(e => {
+    // reach here after 3 sec from second call for Cls#exe2().
+    // XjsErr [Error]: [XJS] An exclusive process to execute was already running by other request.
+    console.log(e);
+});
 ```
 # Error definition
 XJS throws error with `code` property which has one of the following numbers.
