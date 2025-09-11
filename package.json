@@ -1,6 +1,6 @@
 {
   "name": "xjs-common",
-  "version": "13.0.0-alpha.3",
+  "version": "13.0.0-alpha.4",
   "description": "library modules for typescript that bundled general-purpose implementations.",
   "repository": {
     "type": "git",
@@ -32,6 +32,10 @@
       "require": {
         "types": "./build/esm/index.ts",
         "default": "./build/cjs/index.js"
+      },
+      "default": {
+        "types": "./build/esm/index.ts",
+        "default": "./build/esm/index.js"
       }
     }
   },
