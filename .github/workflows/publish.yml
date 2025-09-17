@@ -28,7 +28,7 @@ jobs:
     - name: Push a git tag
       run: |
         git tag ${{ inputs.version }}
-        git push origin ${{ inputs.version }}
+        git push origin ${{ inputs.version }} -f
     - name: Publish
       run: npm publish --provenance --access public
       env:
