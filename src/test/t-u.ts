@@ -53,11 +53,15 @@ mt.appendUnit("retry", async function (this: TestUnit<{
         cbAsync: async () => {
             c.array.push(c.counter);
             c.counter += 1;
-            await delay(0);
-            if (c.counter <= c.errorCount) throw 0;
+            await delay(0.001);
+            if (c.counter <= c.errorCount) throw 1;
             return c.counter;
         }
     }));
+    this.appendCase("handle an error in async retry.", async function (this: TestCase, c) {
+        this.expectError();
+        c.ret = await retry(c.cbAsync, { logger: s_emptyLogger });
+    });
     this.appendCase("async callback was working.", async function (this: TestCase, c) {
         try { c.ret = await retry(c.cbAsync, { count: 2, logger: s_emptyLogger }); } catch { }
         this.check(c.ret === 3, () => `ret => ${c.ret}`);
@@ -69,14 +73,14 @@ mt.appendUnit("retry", async function (this: TestUnit<{
     this.appendCase("interval predicate was working.", async function (this: TestCase, c) {
         try {
             c.ret = await retry(c.cbAsync, {
-                intervalPredicate: async () => { await delay(0); c.array.push(-1); },
-                errorCriterion: e => e === 0, logger: s_emptyLogger, count: 2
+                intervalPredicate: async () => { await delay(0.001); c.array.push(-1); },
+                errorCriterion: e => e === 1, logger: s_emptyLogger, count: 2
             });
         } catch { }
         this.check(UArray.eq(c.array, [0, -1, 1, -1, 2], { sort: false }));
     });
     this.chainContextGen(() => ({
-        cb: () => { throw 0; },
+        cb: () => { throw 1; },
         array: [Date.now()]
     }));
     this.appendCase("intervalSec was working.", async function (this: TestCase, c) {
@@ -84,7 +88,7 @@ mt.appendUnit("retry", async function (this: TestUnit<{
             c.ret = await retry(c.cb, {
                 intervalSec: 0.5,
                 intervalPredicate: () => { c.array.push(Date.now()); },
-                errorCriterion: e => e === 0, logger: s_emptyLogger, count: 2
+                errorCriterion: e => e === 1, logger: s_emptyLogger, count: 2
             });
         } catch { }
         this.check(c.array[2] - c.array[1] >= 500 && c.array[1] - c.array[0] < 500);

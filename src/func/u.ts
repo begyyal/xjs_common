@@ -78,7 +78,10 @@ export function retry<T>(cb: () => MaybePromise<T>, op?: SyncRetryOption | Async
             try { ret = cb(); } catch (e) { if (handleError(e)) ret = prcs(c - 1); else throw e; }
             if (ret instanceof Promise) {
                 return new Promise((resolve, reject) =>
-                    ret.then(resolve).catch((e: any) => { if (handleError(e)) resolve(prcs(c - 1)); else reject(e); }));
+                    ret.then(resolve).catch((e: any) => {
+                        if (handleError(e)) try { ret = resolve(prcs(c - 1)); } catch (e2) { reject(e2); }
+                        else reject(e);
+                    }));
             } else return ret;
         };
         const chain = (c: () => any) => ret instanceof Promise ? ret.then(() => c()) : c();
