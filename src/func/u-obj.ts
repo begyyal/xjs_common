@@ -59,7 +59,7 @@ export namespace UObj {
      * @param op.targetType primitive types which filter the properties to be processed.
      */
     export function manipulateProperties<T extends NormalRecord>(
-        o: T, process: (v: NonObject) => NonObject, op?: {
+        o: T, process: (p: NonObject, k: string) => NonObject, op?: {
             ignoreEmpty?: boolean,
             recursive?: boolean,
             targetType?: MaybeArray<Exclude<Type, "object" | "null" | "undefined">>,
@@ -73,7 +73,7 @@ export namespace UObj {
                 if (_ignoreEmpty && UType.isEmpty(prop)) continue;
                 if (UType.isObject(prop) && _recursive) rec(prop);
                 else if (!UType.isFunction(prop) && (!target || target.some(t => typeof prop === t)))
-                    _o[k] = process(prop);
+                    _o[k] = process(prop, k);
             }
         };
         rec(o);

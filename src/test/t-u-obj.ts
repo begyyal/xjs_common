@@ -102,5 +102,10 @@ mt.appendUnit("manipulateProperties", function (this: TestUnit<{
         UObj.manipulateProperties(c.class_a, p => p.toString() + "test", { targetType: Type.string });
         this.check(c.class_a.a.toString() !== a + "test");
     });
+    this.appendCase("pass property key to the parameter function.", function (this: TestCase, c) {
+        const a = c.class_a.a, b = c.class_a.b;
+        UObj.manipulateProperties(c.class_a, (p, k) => k === "a" ? p.toString() + "test" : p);
+        this.check(c.class_a.a.toString() === a + "test" && c.class_a.b === b);
+    });
 });
 export const T_UObj = mt;
