@@ -4,8 +4,7 @@ on:
     paths:
       - "src/**"
       - "package.json"
-      - "tsconfig.json"
-      - "webpack.config.json"
+      - "tsconfig**.json"
       - ".github/workflows/test.yml"
 jobs:
   test:

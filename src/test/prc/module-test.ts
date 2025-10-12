@@ -6,7 +6,7 @@ export class ModuleTest {
     constructor(readonly name: string) { }
     appendUnit(
         unitName: string,
-        cb: (this: TestUnit) => void | Promise<void>,
+        cb: (this: TestUnit) => MaybePromise<void>,
         op?: { concurrent?: boolean }): TestUnit {
         if (this._units.some(u => u.name === unitName))
             throw Error("duplication of unit name was detected.");

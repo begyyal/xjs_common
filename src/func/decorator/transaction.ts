@@ -4,7 +4,7 @@ import { delay } from "../u";
 const s_errCode = 100;
 
 /**
- * applies transation to the method. note that the method must return a Promise.
+ * applies transation to the method. **note that the method must return a `Promise`**.
  * @param op.timeoutSec default is `30`.
  */
 export function transaction(op?: {

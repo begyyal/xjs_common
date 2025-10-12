@@ -53,7 +53,7 @@ export namespace DType {
     }
     /**
      * express array.
-     * @param elmDesc {@link TypeDesc} or class constructor type.
+     * @param elmDesc {@link TypeDesc} or {@link Ctor|class constructor type}.
      */
     export function array(elmDesc: AnyTypeDesc | Ctor = {}): (target: Object, propKey: string) => void {
         return (target: Object, propKey: string) => setDesc(target, propKey,
@@ -61,7 +61,7 @@ export namespace DType {
     }
     /**
      * express record object. note that this may allow array type because array is essentialy object type has properties. 
-     * @param elmDesc {@link TypeDesc} or class constructor type.
+     * @param elmDesc {@link TypeDesc} or {@link Ctor|class constructor type}.
      */
     export function record(elmDesc: AnyTypeDesc | Ctor = {}): (target: Object, propKey: string) => void {
         return (target: Object, propKey: string) => setDesc(target, propKey,
@@ -69,7 +69,7 @@ export namespace DType {
     }
     /**
      * express an object which has properties that specified class express with {@link DType}. 
-     * @param ctor class constructor type.
+     * @param ctor {@link Ctor|class constructor type}.
      */
     export function object(ctor: Ctor): (target: Object, propKey: string) => void {
         return (target: Object, propKey: string) => setDesc(target, propKey, (td) => td.cls = ctor);
