@@ -108,4 +108,14 @@ mt.appendUnit("manipulateProperties", function (this: TestUnit<{
         this.check(c.class_a.a.toString() === a + "test" && c.class_a.b === b);
     });
 });
+mt.appendUnit("generateRecord", function (this: TestUnit<{
+    class_a: CLS_A
+}>) {
+    this.chainContextGen(_ => ({ class_a: genCLS_A(1)[0] }));
+    this.appendCase("basic functionality", function (this: TestCase, c) {
+        const numary = [1, 2, 3];
+        const o = UObj.generateRecord(numary, n => n + "a");
+        this.check(numary.every(n => o[n] === n + "a"));
+    });
+});
 export const T_UObj = mt;

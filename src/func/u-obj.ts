@@ -79,4 +79,12 @@ export namespace UObj {
         rec(o);
         return o;
     }
+    /**
+     * generate a record object which contains spedified keys with values generated from value generator.
+     * @param keys keys contained in the object.
+     * @param vgen value generator.
+     */
+    export function generateRecord<K extends IndexSignature, V>(keys: K[], vgen: (k: K) => V): Record<K, V> {
+        return keys.reduce((o, k) => { o[k] = vgen(k); return o; }, {} as Record<K, V>);
+    }
 }
