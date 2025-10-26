@@ -80,7 +80,7 @@ export namespace UObj {
         return o;
     }
     /**
-     * generate a record object which contains spedified keys with values generated from value generator.
+     * generate a record object which contains specified keys with values generated from value generator.
      * @param keys keys contained in the object.
      * @param vgen value generator.
      */
