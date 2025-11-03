@@ -71,15 +71,18 @@ export function retry<T>(cb: () => MaybePromise<T>, op?: SyncRetryOption | Async
         if (op?.errorCriterion && !op.errorCriterion(e)) return false;
         l.warn(e); return true;
     };
-    const prcs = (c: number) => {
-        if (c < 0) throw new XjsErr(s_errCode, "failure exceeds retryable count.");
+    const prcs = (c: number, e?: any) => {
+        if (c < 0) {
+            l.error("failure exceeds retryable count.");
+            throw e ?? new XjsErr(s_errCode, "failure exceeds retryable count.");
+        }
         let ret = null;
         const innerPrcs = () => {
-            try { ret = cb(); } catch (e) { if (handleError(e)) ret = prcs(c - 1); else throw e; }
+            try { ret = cb(); } catch (e) { if (handleError(e)) ret = prcs(c - 1, e); else throw e; }
             if (ret instanceof Promise) {
                 return new Promise((resolve, reject) =>
                     ret.then(resolve).catch((e: any) => {
-                        if (handleError(e)) try { ret = resolve(prcs(c - 1)); } catch (e2) { reject(e2); }
+                        if (handleError(e)) try { ret = resolve(prcs(c - 1, e)); } catch (e2) { reject(e2); }
                         else reject(e);
                     }));
             } else return ret;

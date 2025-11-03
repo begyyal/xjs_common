@@ -59,7 +59,7 @@ mt.appendUnit("retry", async function (this: TestUnit<{
         }
     }));
     this.appendCase("handle an error in async retry.", async function (this: TestCase, c) {
-        this.expectError();
+        this.expectError(e => e === 1);
         c.ret = await retry(c.cbAsync, { logger: s_emptyLogger });
     });
     this.appendCase("async callback was working.", async function (this: TestCase, c) {
