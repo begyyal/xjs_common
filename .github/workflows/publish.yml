@@ -31,8 +31,6 @@ jobs:
         git push origin ${{ inputs.version }} -f
     - name: Publish
       run: npm publish --provenance --access public
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     - name: Post tweet
       run: |
         ./tool/tweet_template.sh \
