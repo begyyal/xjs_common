@@ -63,6 +63,24 @@ mt.appendUnit("distinct", function (this: TestUnit<{
         this.check(timeKeybase * 3 < (Date.now() - t));
     });
 });
+mt.appendUnit("duplicate", function (this: TestUnit<{
+    array1: number[],
+    array2: IF_A[]
+}>) {
+    this.chainContextGen(_ => ({ array1: [1, 2, 2, 3, 4, 5, 5], array2: [...genIF_A(3), ...genIF_A(1)] }));
+    this.appendCase("basic functionality.", function (this: TestCase, c) {
+        this.check(UArray.eq(UArray.duplicate(c.array1), [2, 2, 5, 5]));
+    });
+    this.appendCase("basic functionality with property key.", function (this: TestCase, c) {
+        const ret = UArray.duplicate(c.array2, { k: "id" });
+        this.check(ret.length === 2 && ret.every(a => a.id === 0));
+    });
+    this.appendCase("basic functionality with filter predicate.", function (this: TestCase, c) {
+        c.array2[0].a = "x";
+        const ret = UArray.duplicate(c.array2, { predicate: (a, b) => a.a === b.a });
+        this.check(ret.length === 3 && UArray.eq(ret.map(a => a.id), [0, 1, 2]));
+    });
+});
 mt.appendUnit("eq", function (this: TestUnit<{
     array1: number[],
     array2: number[],

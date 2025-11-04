@@ -21,7 +21,7 @@ export namespace UArray {
         return a.every((v: any, i: number) => useStrictEqual ? v === b[i] : v == b[i]);
     }
     /** 
-     * returns array which is removed duplicate of elements.
+     * returns an array which is removed duplicate of elements.
      * this doesn't mutate the param. 
      */
     export function distinct<T>(array: T[]): T[];
@@ -40,7 +40,28 @@ export namespace UArray {
         return result;
     }
     /**
-     * chop array to partial arrays which have specified length. the remainder is added to end of a result.  
+     * returns an array which contains duplicate values of the original array.
+     * this doesn't mutate the param. 
+     */
+    export function duplicate<T>(array: T[]): T[];
+    export function duplicate<T>(array: T[], op?: { k?: keyof T }): T[]
+    export function duplicate<T>(array: T[], op?: { predicate?: (v1: T, v2: T) => boolean }): T[]
+    export function duplicate<T>(array: T[], op?: { k?: keyof T, predicate?: (v1: T, v2: T) => boolean }): T[] {
+        if (!array || array.length === 0) return [];
+        if (op?.k) return Array.from(array2map(array, e => e[op.k]).values()).filter(a => a.length > 1).flatMap(a => a);
+        const a = [...array], result = [];
+        const p = op?.predicate ?? ((v1, v2) => v1 == v2);
+        while (a.length > 0) {
+            const e = a.pop();
+            let dup: T[] = [];
+            for (let i = a.length - 1, e2: T = a[i]; i >= 0; i--, e2 = a[i])
+                if (p(e, e2)) { a.splice(i, 1); dup.push(e2); }
+            if (dup.length > 0) result.push(...dup, e);
+        }
+        return result;
+    }
+    /**
+     * chop an array to partial arrays which have specified length. the remainder is added to end of a result.  
      * this function has compatibility to {@link AlmostArray} like {@link Uint8Array} etc.
      */
     export function chop<E>(array: E[], len: number): E[][];
