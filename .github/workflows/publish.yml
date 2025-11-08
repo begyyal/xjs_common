@@ -20,7 +20,9 @@ jobs:
         node-version: '22.x'
         registry-url: 'https://registry.npmjs.org'
     - name: Build and test
-      run: npm ci && npm run build && npm test
+      run: |
+        npm install -g npm@latest
+        npm ci && npm run build && npm test
     - name: Set git configs
       run: |
         git config --global user.email "begyyal@gmail.com"
