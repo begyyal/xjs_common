@@ -1,6 +1,9 @@
-import { delay, int2array, retry } from "../func/u";
+import { array2map, delay, int2array, retry } from "../func/u";
 import { UArray } from "../func/u-array";
+import { UType } from "../func/u-type";
 import { s_emptyLogger } from "./const/test-helper";
+import { genIF_A, genIF_B } from "./func/u";
+import { IF_A, IF_B } from "./obj/if-common";
 import { ModuleTest } from "./prc/module-test";
 import { TestCase } from "./prc/test-case";
 import { TestUnit } from "./prc/test-unut";
@@ -14,6 +17,22 @@ mt.appendUnit("int2array", function (this: TestUnit) {
     this.appendCase("accept parsable string correctly.", function (this: TestCase) {
         const a: any = "3";
         this.check(int2array(a).length === 3);
+    });
+});
+mt.appendUnit("array2map", function (this: TestUnit<{
+    array1: IF_A[],
+    array2: IF_B[]
+}>) {
+    this.chainContextGen(_ => ({ array1: genIF_A(3), array2: genIF_B(3) }));
+    this.appendCase("basic functionality", function (this: TestCase, c) {
+        const map = array2map([...c.array1, ...c.array2], v => v.id);
+        this.check(Array.from(map.keys()).length === 3);
+        this.check(Array.from(map.values()).every(v => v.length === 2));
+    });
+    this.appendCase("off accumulation.", function (this: TestCase, c) {
+        const map = array2map([...c.array1, ...c.array2], v => v.id, { accumulate: false });
+        this.check(Array.from(map.keys()).length === 3);
+        this.check(Array.from(map.values()).every(v => !UType.isArray(v)));
     });
 });
 mt.appendUnit("retry", async function (this: TestUnit<{
