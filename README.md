@@ -33,7 +33,6 @@ import { delay, int2array, UHttp, retry, MaybeArray, Loggable } from "xjs-common
 
     // true
     console.log(UHttp.isHttpSuccess(204));
-
     // https://aaa.com?p1=a&p2=1&p2=2
     console.log(UHttp.concatParamsWithEncoding("https://aaa.com", { p1: "a", p2: ["1", "2"] }));
     // p1=a&p2=1&p2=2
@@ -48,6 +47,8 @@ import { UArray } from "xjs-common";
     // [ 1, 3, 2, 5, 4 ]
     const ary1 = UArray.distinct([1, 3, 2, 2, 1, 5, 4]);
     console.log(ary1);
+    // [1, 1, 2, 2]
+    console.log(UArray.duplicate([1, 3, 2, 2, 1, 5, 4]));
 
     // [ 5, 4 ]
     console.log(UArray.takeOut(ary1, v => v > 3));
