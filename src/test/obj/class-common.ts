@@ -17,6 +17,8 @@ export class CLS_B extends CLS_Base {
     @DType.required
     @DType.boolean
     e: boolean;
+    @DType.object(CLS_B)
+    cls_b: CLS_B;
     q: any;
     constructor(
         id?: number,
@@ -40,7 +42,7 @@ export class CLS_A extends CLS_Base {
     @DType.string
     b: string;
     @DType.object(CLS_B)
-    c: CLS_B;
+    cls_b: CLS_B;
     p: any;
     @DType.record({ t: Type.number })
     record: any;
@@ -54,7 +56,7 @@ export class CLS_A extends CLS_Base {
         this.id = id;
         this.a = a;
         this.b = b;
-        this.c = c;
+        this.cls_b = c;
         this.p = p;
     }
 }

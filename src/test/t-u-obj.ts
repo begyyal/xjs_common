@@ -1,6 +1,7 @@
 import { Type } from "../const/types";
+import { UArray } from "../func/u-array";
 import { UObj } from "../func/u-obj";
-import { genCLS_A, genIF_A, genIF_B } from "./func/u";
+import { genCLS_A, genCLS_B, genIF_A, genIF_B } from "./func/u";
 import { CLS_A, CLS_B, CLS_C } from "./obj/class-common";
 import { IF_A, IF_B, IF_C } from "./obj/if-common";
 import { ModuleTest } from "./prc/module-test";
@@ -28,11 +29,11 @@ mt.appendUnit("assignProperties", function (this: TestUnit<{
     });
     this.appendCase("keeping d-type class optipn works.", function (this: TestCase) {
         const assign4keepOption = (keep: boolean) => {
-            const b = { id: 1, a: 2, b: "3", c: { id: 11, d: [1], e: "bad" } };
+            const b = { id: 1, a: 2, b: "3", cls_b: { id: 11, d: [1], e: "bad" } };
             return UObj.assignProperties(genCLS_A(1)[0], b, null, keep);
         };
-        this.check(!((assign4keepOption(false).c as any) instanceof CLS_B));
-        this.check((assign4keepOption(true).c as any) instanceof CLS_B)
+        this.check(!((assign4keepOption(false).cls_b as any) instanceof CLS_B));
+        this.check((assign4keepOption(true).cls_b as any) instanceof CLS_B)
     });
 });
 mt.appendUnit("crop", function (this: TestUnit<{
@@ -42,18 +43,31 @@ mt.appendUnit("crop", function (this: TestUnit<{
     this.chainContextGen(_ => ({ class_a: genCLS_A(1)[0] }));
     this.appendCase("basic functionality", function (this: TestCase, c) {
         const cropped = UObj.crop(c.class_a, ["id", "a", "p"]);
-        this.check(Object.keys(cropped).length === 3 && !cropped.b && !cropped.c, () => JSON.stringify(cropped));
+        this.check(Object.keys(cropped).length === 3 && !cropped.b && !cropped.cls_b, () => JSON.stringify(cropped));
     });
     this.appendCase("exclusive mode works.", function (this: TestCase, c) {
-        const cropped = UObj.crop(c.class_a, ["a", "b"], true);
+        const cropped = UObj.crop(c.class_a, ["a", "b"], { removeKeys: true });
         this.check(Object.keys(cropped).length === 5 && !cropped.a && !cropped.b, () => JSON.stringify(cropped));
     });
     this.appendCase("cropping based on d-type decorator works.", function (this: TestCase, c) {
         const cropped = UObj.crop(c.class_a);
-        this.check(Object.keys(cropped).length === 6 && !cropped.p && !cropped.c.q, () => JSON.stringify(cropped));
+        this.check(Object.keys(cropped).length === 6 && !cropped.p && !cropped.cls_b.q, () => JSON.stringify(cropped));
     });
     this.appendCase("no error when recursive property is null.", function (this: TestCase, c) {
-        c.class_a.c = null; UObj.crop(c.class_a);
+        c.class_a.cls_b = null; UObj.crop(c.class_a);
+    });
+    this.chainContextGen(c => {
+        c.class_a.cls_b.cls_b = genCLS_B(1)[0];
+        return c;
+    })
+    this.appendCase("crop properties by keys recursively.", function (this: TestCase, c) {
+        const cropped = UObj.crop(c.class_a, ["cls_b"], { recursive: true });
+        this.check(UArray.eq(Object.keys(cropped), ["cls_b"]));
+        this.check(UArray.eq(Object.keys(cropped.cls_b), ["cls_b"]));
+    });
+    this.appendCase("crop properties by keys recursively with remove flag.", function (this: TestCase, c) {
+        const cropped = UObj.crop(c.class_a, ["id"], { recursive: true, removeKeys: true });
+        this.check(!cropped.id && !cropped.cls_b.id);
     });
     this.clearContextGen();
     this.chainContextGen(_ => ({ redundant_a: { id: 1, a: 1, aa: 1 } }))
@@ -84,18 +98,18 @@ mt.appendUnit("manipulateProperties", function (this: TestUnit<{
         this.check(c.class_a.a.toString() === a + "test" && c.class_a.b === b + "test");
     });
     this.appendCase("manipulate property recursively as default.", function (this: TestCase, c) {
-        const q = c.class_a.c.q;
+        const q = c.class_a.cls_b.q;
         UObj.manipulateProperties(c.class_a, p => p.toString() + "test");
-        this.check(c.class_a.c.q === q + "test");
+        this.check(c.class_a.cls_b.q === q + "test");
     });
     this.appendCase("ignoreEmpty option works.", function (this: TestCase, c) {
         this.expectError();
         UObj.manipulateProperties(c.class_a, p => p.toString(), { ignoreEmpty: false });
     });
     this.appendCase("recursive option works.", function (this: TestCase, c) {
-        const q = c.class_a.c.q;
+        const q = c.class_a.cls_b.q;
         UObj.manipulateProperties(c.class_a, p => p.toString() + "test", { recursive: false });
-        this.check(c.class_a.c.q !== q + "test");
+        this.check(c.class_a.cls_b.q !== q + "test");
     });
     this.appendCase("targetType option works.", function (this: TestCase, c) {
         const a = c.class_a.a;

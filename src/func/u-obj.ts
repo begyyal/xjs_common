@@ -22,9 +22,10 @@ export namespace UObj {
      * crop properties of the object other than specified. the properties are to be removed with `delete` operator.
      * @param o object whose properties to be removed.
      * @param keys property names to be remained.
-     * @param removeKeys if true, it removes `keys` instead of remaining it.
+     * @param op.removeKeys if true, it removes `keys` instead of remaining it.
+     * @param op.recursive whether it crops properties of an object recursively. default is false.
      */
-    export function crop<T extends NormalRecord>(o: T, keys: (keyof T)[], removeKeys?: boolean): Partial<T>;
+    export function crop<T extends NormalRecord>(o: T, keys: (keyof T)[], op?: { removeKeys?: boolean, recursive?: boolean }): Partial<T>;
     /**
      * crop properties that is not decorated with {@link DType}. the properties will be removed with `delete` operator. 
      * this treats constructual decorator such as {@link DType.object} recursively.
@@ -32,11 +33,12 @@ export namespace UObj {
      * @param ctor class constructor type whose properties are decorated with {@link DType}. **NOTE** that need to have public constructor without any parameter.
      */
     export function crop<T extends NormalRecord>(o: T, ctor?: Ctor): Partial<T>;
-    export function crop<T extends NormalRecord>(o: T, keys_or_ctor?: (keyof T)[] | Ctor, removeKeys?: boolean): Partial<T> {
+    export function crop<T extends NormalRecord>(o: T, keys_or_ctor?: (keyof T)[] | Ctor, op?: { removeKeys?: boolean, recursive?: boolean }): Partial<T> {
+        const _removeKeys = !!op?.removeKeys;
         const tm: TypeMap = Array.isArray(keys_or_ctor) ? null
             : (!keys_or_ctor || o instanceof keys_or_ctor ? o[smbl_tm] : new keys_or_ctor()[smbl_tm]);
         const _keys = tm ? Object.keys(tm) : (keys_or_ctor as IndexSignature[] ?? []);
-        if (_keys.length === 0) return removeKeys ? o : {};
+        if (_keys.length === 0) return _removeKeys ? o : {};
         Object.keys(o).filter(k => {
             if (tm && tm[k] && o[k]) {
                 if (tm[k].cls) crop(o[k], tm[k]?.cls);
@@ -45,7 +47,9 @@ export namespace UObj {
                     Object.values(o[k]).forEach(v => crop(v, vCtor));
                 }
             }
-            return !!removeKeys === _keys.includes(k);
+            const rm = _removeKeys === _keys.includes(k);
+            if (!rm && op?.recursive && UType.isObject(o[k])) crop(o[k] as any, _keys, op);
+            return rm;
         }).forEach(k => delete o[k]);
         return o;
     }

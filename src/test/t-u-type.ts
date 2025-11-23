@@ -37,35 +37,35 @@ mt.appendUnit("validate", function (this: TestUnit<{
     });
     this.chainContextGen(_ => ({ class_b: new CLS_B(2) }));
     this.appendCase("recursive decorator works.", function (this: TestCase, c) {
-        Object.assign(c.class_a, { c: c.class_b });
+        Object.assign(c.class_a, { cls_b: c.class_b });
         const actual = UType.validate(c.class_a);
-        this.check(UArray.eq(actual, ["c.d", "c.e"]), () => `actual => ${actual}`);
+        this.check(UArray.eq(actual, ["cls_b.d", "cls_b.e"]), () => `actual => ${actual}`);
     });
     this.appendCase("array decorator works.", function (this: TestCase, c) {
         Object.assign(c.class_b, { d: 3, e: true });
-        Object.assign(c.class_a, { c: c.class_b });
-        this.check(UArray.eq(UType.validate(c.class_a), ["c.d"]));
+        Object.assign(c.class_a, { cls_b: c.class_b });
+        this.check(UArray.eq(UType.validate(c.class_a), ["cls_b.d"]));
     });
     this.appendCase("check valid types in array.", function (this: TestCase, c) {
         Object.assign(c.class_b, { e: true, d: [3] });
-        Object.assign(c.class_a, { c: c.class_b });
+        Object.assign(c.class_a, { cls_b: c.class_b });
         const actual = UType.validate(c.class_a);
         this.check(actual.length === 0, () => `actual => ${actual}`);
     });
     this.appendCase("check invalid types in array.", function (this: TestCase, c) {
         Object.assign(c.class_b, { e: true, d: ["3"] });
-        Object.assign(c.class_a, { c: c.class_b });
-        this.check(UArray.eq(UType.validate(c.class_a), ["c.d.0"]));
+        Object.assign(c.class_a, { cls_b: c.class_b });
+        this.check(UArray.eq(UType.validate(c.class_a), ["cls_b.d.0"]));
     });
     this.appendCase("property decorated as array can accept empty array.", function (this: TestCase, c) {
         Object.assign(c.class_b, { e: true, d: [] });
-        Object.assign(c.class_a, { c: c.class_b });
+        Object.assign(c.class_a, { cls_b: c.class_b });
         this.check(UType.validate(c.class_a).length === 0);
     });
     this.appendCase("boolean decorator detects invalid value.", function (this: TestCase, c) {
         Object.assign(c.class_b, { e: 123, d: [] });
-        Object.assign(c.class_a, { c: c.class_b });
-        this.check(UArray.eq(UType.validate(c.class_a), ["c.e"]));
+        Object.assign(c.class_a, { cls_b: c.class_b });
+        this.check(UArray.eq(UType.validate(c.class_a), ["cls_b.e"]));
     });
     this.appendCase("decorators in super class works.", function (this: TestCase, c) {
         Object.assign(c.class_a, { x: "a" });
