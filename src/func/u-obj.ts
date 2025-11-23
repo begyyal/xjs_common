@@ -25,6 +25,7 @@ export namespace UObj {
      * @param op.removeKeys if true, it removes `keys` instead of remaining it.
      * @param op.recursive whether it crops properties of an object recursively. default is false.
      */
+    export function crop<T extends NormalRecord>(o: T, keys: IndexSignature[], op: { removeKeys: true, recursive: true }): Partial<T>;
     export function crop<T extends NormalRecord>(o: T, keys: (keyof T)[], op?: { removeKeys?: boolean, recursive?: boolean }): Partial<T>;
     /**
      * crop properties that is not decorated with {@link DType}. the properties will be removed with `delete` operator. 

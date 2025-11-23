@@ -66,8 +66,8 @@ mt.appendUnit("crop", function (this: TestUnit<{
         this.check(UArray.eq(Object.keys(cropped.cls_b), ["cls_b"]));
     });
     this.appendCase("crop properties by keys recursively with remove flag.", function (this: TestCase, c) {
-        const cropped = UObj.crop(c.class_a, ["id"], { recursive: true, removeKeys: true });
-        this.check(!cropped.id && !cropped.cls_b.id);
+        const cropped = UObj.crop(c.class_a, ["id", "e"], { recursive: true, removeKeys: true });
+        this.check(!cropped.id && !cropped.cls_b.id && !cropped.cls_b.e);
     });
     this.clearContextGen();
     this.chainContextGen(_ => ({ redundant_a: { id: 1, a: 1, aa: 1 } }))
