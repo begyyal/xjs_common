@@ -54,7 +54,7 @@ export interface RetryOption<T = MaybePromise> {
 export interface SyncRetryOption extends RetryOption<void> { };
 export interface AsyncRetryOption extends RetryOption {
     /**
-     * secounds to wait between callbacks. this wait occurs after `intervalPredicate`.
+     * seconds to wait between callbacks. this wait occurs after `intervalPredicate`.
      */
     intervalSec?: number;
 };

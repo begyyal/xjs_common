@@ -15,8 +15,8 @@ export namespace UString {
     /**
      * generate date time number as fixed length (depends on `unit`) string without separator charactor.  
      * For example, `2025-06-08T10:15:06.366Z` is to be `20250608101506366`.
-     * @param op.date Date object refered by this. default is `new Date()`.
-     * @param op.unit time unit. default is secound.
+     * @param op.date Date object referred by this. default is `new Date()`.
+     * @param op.unit time unit. default is second.
      */
     export function simpleTime(op?: { date?: Date, unit?: TimeUnit }): string {
         const t = (op?.date ?? new Date()).toISOString().split(".")[0].replace(/[-T:]/g, "");
