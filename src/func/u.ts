@@ -16,25 +16,6 @@ export function int2array(size: number): number[] {
     if (Number.isNaN(s)) throw new XjsErr(s_errCode, "size of the argument is not number.");
     return Array.from(Array(s).keys());
 }
-/**
- * generate `Map` object from an array.
- * @param array source array.
- * @param keyGen predicate which generates map keys from a value of the array.
- * @param op.accumulate flag whether values of the map are accumulated or not if key/value from the array conflict. default is true. 
- */
-export function array2map<K, T>(array: T[], keyGen: (e: T) => K): Map<K, T[]>;
-export function array2map<K, T>(array: T[], keyGen: (e: T) => K, op: { accumulate: false }): Map<K, T>;
-export function array2map<K, T>(array: T[], keyGen: (e: T) => K, op?: { accumulate?: boolean }): Map<K, T[]>;
-export function array2map<K, T>(array: T[], keyGen: (e: T) => K, op?: { accumulate?: boolean }): Map<K, MaybeArray<T>> {
-    const _acm = op?.accumulate ?? true;
-    const map = new Map<K, MaybeArray<T>>();
-    for (const e of array) {
-        const k = keyGen(e);
-        if (map.has(k)) _acm && (map.get(k) as T[]).push(e);
-        else map.set(k, _acm ? [e] : e);
-    }
-    return map;
-}
 export interface RetryOption<T = MaybePromise> {
     /**
      * number of retries. default is 1.

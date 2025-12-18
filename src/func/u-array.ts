@@ -1,5 +1,6 @@
 import { AlmostArray } from "../const/types";
-import { array2map, int2array } from "./u";
+import { Array2 } from "./array2";
+import { int2array } from "./u";
 
 export namespace UArray {
     /** 
@@ -32,7 +33,7 @@ export namespace UArray {
     export function distinct<T>(array: T[],
         op?: { k?: keyof T, predicate?: (v1: T, v2: T) => boolean, takeLast?: boolean }): T[] {
         if (!array || array.length === 0) return [];
-        if (op?.k) return Array.from(array2map(array, e => e[op.k]).values()).map(a => op?.takeLast ? a.pop() : a.shift());
+        if (op?.k) return Array.from(Array2.map(array, e => e[op.k]).values()).map(a => op?.takeLast ? a.pop() : a.shift());
         const a = op?.takeLast ? [...array].reverse() : [...array];
         const p = op?.predicate ?? ((v1, v2) => v1 == v2);
         const result = [a.shift()];
@@ -48,7 +49,7 @@ export namespace UArray {
     export function duplicate<T>(array: T[], op?: { predicate?: (v1: T, v2: T) => boolean }): T[]
     export function duplicate<T>(array: T[], op?: { k?: keyof T, predicate?: (v1: T, v2: T) => boolean }): T[] {
         if (!array || array.length === 0) return [];
-        if (op?.k) return Array.from(array2map(array, e => e[op.k]).values()).filter(a => a.length > 1).flatMap(a => a);
+        if (op?.k) return Array.from(Array2.map(array, e => e[op.k]).values()).filter(a => a.length > 1).flatMap(a => a);
         const a = [...array], result = [];
         const p = op?.predicate ?? ((v1, v2) => v1 == v2);
         while (a.length > 0) {
