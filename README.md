@@ -14,7 +14,7 @@ if you has been used the features (e.g. `HttpResolver`, `UFile`), please use the
 # Code example (only part)
 ### Miscellaneous utilities.
 ```ts
-import { delay, int2array, UHttp, retry, MaybeArray, Loggable } from "xjs-common";
+import { delay, int2array, UHttp, retry, MaybeArray, Loggable, valueof } from "xjs-common";
 
 (async () => {
     // await 3 seconds.
@@ -35,8 +35,9 @@ import { delay, int2array, UHttp, retry, MaybeArray, Loggable } from "xjs-common
     console.log(UHttp.isHttpSuccess(204));
     // https://aaa.com?p1=a&p2=1&p2=2
     console.log(UHttp.concatParamsWithEncoding("https://aaa.com", { p1: "a", p2: ["1", "2"] }));
-    // p1=a&p2=1&p2=2
-    console.log(UHttp.concatParamsWithEncoding(null, { p1: "a", p2: ["1", "2"] }));
+    // checks and casts a value like enum valueof.
+    enum EnumA { A = "a", B = "b" }
+    const e: EnumA = valueof(EnumA, "a");
 })();
 ```
 ### Array utilities.

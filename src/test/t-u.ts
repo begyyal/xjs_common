@@ -1,5 +1,6 @@
-import { delay, int2array, retry } from "../func/u";
+import { delay, int2array, retry, valueof } from "../func/u";
 import { UArray } from "../func/u-array";
+import { EnumA, EnumB } from "./const/enum";
 import { s_emptyLogger } from "./const/test-helper";
 import { ModuleTest } from "./prc/module-test";
 import { TestCase } from "./prc/test-case";
@@ -94,4 +95,17 @@ mt.appendUnit("retry", async function (this: TestUnit<{
         this.check(c.array[2] - c.array[1] >= 500 && c.array[1] - c.array[0] < 500);
     });
 });
+mt.appendUnit("valueof", function (this: TestUnit) {
+    this.appendCase("cast to value from string.", function (this: TestCase) {
+        const v: EnumA = valueof(EnumA, "a");
+        this.check(v === "a");
+    });
+    this.appendCase("cast to value from number.", function (this: TestCase) {
+        const v: EnumB = valueof(EnumB, 2);
+        this.check(v === 2);
+    });
+    this.appendCase("exclude a value the enum doesm't contain.", function (this: TestCase) {
+        this.check(valueof(EnumA, 1) === undefined);
+    });
+})
 export const T_U = mt;

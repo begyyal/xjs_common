@@ -1,4 +1,4 @@
-import { Loggable, MaybeArray, MaybePromise } from "../const/types";
+import { IndexSignature, Loggable, MaybePromise } from "../const/types";
 import { XjsErr } from "../obj/xjs-err";
 import { UType } from "./u-type";
 
@@ -86,4 +86,18 @@ export function retry<T>(cb: () => MaybePromise<T>, op?: SyncRetryOption | Async
         return chain(innerPrcs);
     };
     return prcs(initialCount);
+}
+/**
+ * this checks whether the object (**mainly enum**) has the value or not.  
+ * if true this returns the value as value type of the object.  
+ * ```js
+ * enum EnumA {
+ *   A = "a",
+ *   B = "b"
+ * }
+ * const enm: EnumA = valueof(EnumA, "a");
+ * ```
+ */
+export function valueof<E extends { [k: string]: IndexSignature }>(o: E, v: IndexSignature): (typeof o)[keyof typeof o] {
+    return Object.values(o).find(v2 => v2 === v) as (typeof o)[keyof typeof o];
 }
