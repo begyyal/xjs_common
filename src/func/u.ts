@@ -26,7 +26,7 @@ export interface RetryOption<T = MaybePromise> {
      */
     logger?: Loggable;
     /**
-     * distinguish whether retry is required form exceptions. default is none. (i.e. allways required.)
+     * distinguish whether retry is required from exceptions. default is none. (i.e. always required.)
      */
     errorCriterion?: (e: any) => boolean;
     /**

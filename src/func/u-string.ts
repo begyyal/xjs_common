@@ -13,7 +13,7 @@ export namespace UString {
         return int2array(mlt).map(_ => token).join("");
     }
     /**
-     * generate date time number as fixed length (depends on `unit`) string without separator charactor.  
+     * generate date time number as fixed length (depends on `unit`) string without separator character.  
      * For example, `2025-06-08T10:15:06.366Z` is to be `20250608101506366`.
      * @param op.date Date object referred by this. default is `new Date()`.
      * @param op.unit time unit. default is second.
