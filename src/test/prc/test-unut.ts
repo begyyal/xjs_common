@@ -40,9 +40,9 @@ export class TestUnit<C = any> {
     }
     async exe(): Promise<void> {
         try {
-            this.initalizer?.();
+            await this.initalizer?.();
             for (const tc of this._cases.filter(c => !c.op?.concurrent)) await tc.exe();
             await Promise.all(this._cases.filter(c => !!c.op?.concurrent).map(tc => tc.exe()));
-        } finally { this.finalizer?.(); }
+        } finally { await this.finalizer?.(); }
     }
 }

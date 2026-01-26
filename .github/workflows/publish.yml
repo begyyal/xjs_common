@@ -32,7 +32,7 @@ jobs:
         git tag ${{ inputs.version }}
         git push origin ${{ inputs.version }} -f
     - name: Publish
-      run: npm publish --provenance --access public
+      run: npm publish --provenance --access public --tag ${{ github.ref_name == 'main' && 'latest' || 'alpha' }}
     - name: Post tweet
       run: |
         ./tool/tweet_template.sh \

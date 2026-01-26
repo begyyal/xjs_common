@@ -1,3 +1,4 @@
+import { TimeUnit } from "../const/time-unit";
 import { IndexSignature, Loggable, MaybePromise } from "../const/types";
 import { XjsErr } from "../obj/xjs-err";
 import { UType } from "./u-type";
@@ -100,4 +101,12 @@ export function retry<T>(cb: () => MaybePromise<T>, op?: SyncRetryOption | Async
  */
 export function valueof<E extends { [k: string]: IndexSignature }>(o: E, v: IndexSignature): (typeof o)[keyof typeof o] {
     return Object.values(o).find(v2 => v2 === v) as (typeof o)[keyof typeof o];
+}
+export function toMsec(value: number, unit: TimeUnit.Sec | TimeUnit.Min | TimeUnit.Hour | TimeUnit.Day): number {
+    let v = value;
+    if (unit <= TimeUnit.Sec) v *= 1000;
+    if (unit <= TimeUnit.Min) v *= 60;
+    if (unit <= TimeUnit.Hour) v *= 60;
+    if (unit <= TimeUnit.Day) v *= 24;
+    return v;
 }

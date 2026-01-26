@@ -1,4 +1,5 @@
-import { delay, int2array, retry, valueof } from "../func/u";
+import { TimeUnit } from "../const/time-unit";
+import { delay, int2array, retry, toMsec, valueof } from "../func/u";
 import { UArray } from "../func/u-array";
 import { EnumA, EnumB } from "./const/enum";
 import { s_emptyLogger } from "./const/test-helper";
@@ -107,5 +108,19 @@ mt.appendUnit("valueof", function (this: TestUnit) {
     this.appendCase("exclude a value the enum doesm't contain.", function (this: TestCase) {
         this.check(valueof(EnumA, 1) === undefined);
     });
-})
+});
+mt.appendUnit("toMsec", function (this: TestUnit) {
+    this.appendCase("convert seconds.", function (this: TestCase) {
+        this.check(toMsec(3, TimeUnit.Sec) === 3000);
+    });
+    this.appendCase("convert minutes.", function (this: TestCase) {
+        this.check(toMsec(3, TimeUnit.Min) === 3 * 1000 * 60);
+    });
+    this.appendCase("convert hours.", function (this: TestCase) {
+        this.check(toMsec(3, TimeUnit.Hour) === 3 * 1000 * 60 * 60);
+    });
+    this.appendCase("convert days.", function (this: TestCase) {
+        this.check(toMsec(3, TimeUnit.Day) === 3 * 1000 * 60 * 60 * 24);
+    });
+});
 export const T_U = mt;
