@@ -1,6 +1,7 @@
 import { AlmostArray } from "../const/types";
 import { Array2 } from "./array2";
 import { int2array } from "./u";
+import { UType } from "./u-type";
 
 export namespace UArray {
     /** 
@@ -97,5 +98,11 @@ export namespace UArray {
                 array.splice(i, 1);
             }
         return result;
+    }
+    export async function parallelForEach<T, R>(array: T[], predicate: (e: T) => Promise<R>, paraCount: number = 3): Promise<R[]> {
+        let ret = [];
+        for (const set of UArray.chop(array, paraCount))
+            ret.push(...(await Promise.all(set.map(predicate))).filter(UType.isDefined));
+        return ret;
     }
 }

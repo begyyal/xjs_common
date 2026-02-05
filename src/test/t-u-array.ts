@@ -1,5 +1,5 @@
 import { AlmostArray } from "../const/types";
-import { int2array } from "../func/u";
+import { delay, int2array } from "../func/u";
 import { UArray } from "../func/u-array";
 import { genIF_A } from "./func/u";
 import { IF_A } from "./obj/if-common";
@@ -157,5 +157,19 @@ mt.appendUnit("chop", function (this: TestUnit) {
         const expected = [new Uint8Array([1, 2]), new Uint8Array([3, 4]), new Uint8Array([5])];
         this.check(actual.toString() === expected.toString());
     });
+});
+mt.appendUnit("parallelForEach", function (this: TestUnit) {
+    this.appendCase("basic functionality", async function (this: TestCase) {
+        const before = Date.now();
+        await UArray.parallelForEach([1, 1, 1], n => delay(n));
+        const msec = Date.now() - before;
+        this.check(msec >= 1000 && msec < 2000, () => `${msec} mill seconds.`);
+    }, { concurrent: true });
+    this.appendCase("set parallel count.", async function (this: TestCase) {
+        const before = Date.now();
+        await UArray.parallelForEach([1, 1, 1], n => delay(n), 2);
+        const msec = Date.now() - before;
+        this.check(msec >= 2000 && msec < 3000, () => `${msec} mill seconds.`);
+    }, { concurrent: true });
 });
 export const T_UArray = mt;

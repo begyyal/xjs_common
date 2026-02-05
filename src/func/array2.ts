@@ -34,6 +34,9 @@ export namespace Array2 {
             ? (o, korv) => { o[op.kgen(korv as V)] = korv as V; return o; }
             : (o, korv) => { o[korv as K] = op.vgen(korv as K); return o; }, {} as Record<K, V>);
     }
+    /** 
+     * sum up numbers in the array. if the array is empty, this returns `0`. 
+     */
     export function sum(array: (number | `${number}`)[]): number {
         return array.map(e => UType.isNumber(e) ? e : Number(e)).reduce((a, b) => a + b, 0);
     }
