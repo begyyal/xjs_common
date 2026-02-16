@@ -47,7 +47,7 @@ export namespace UString {
             .map((idx, i) => (idx + 1) * (26 ** i)).reduce((v1, v2) => v1 + v2) - 1;
     }
     function asAmount(amount: number, unit: string): string {
-        const int2dec = amount.toString().split(".");
+        const int2dec = Math.abs(amount).toString().split(".");
         const etni = int2dec[0].split("").reverse().join("");
         let fetni = "";
         const max = Math.ceil(etni.length / 3);
@@ -56,8 +56,7 @@ export namespace UString {
             else fetni += (etni.substring(i * 3, (i + 1) * 3) + ",");
         }
         const finte = unit + fetni.split("").reverse().join("");
-        if (int2dec.length === 1) return finte;
-        else return finte + "." + int2dec[1];
+        return (amount < 0 ? "-" : "") + (int2dec.length === 1 ? finte : finte + "." + int2dec[1]);
     }
     export function asJpy(amount: number): string {
         return UType.isEmpty(amount) ? "" : asAmount(Math.floor(amount), "¥");

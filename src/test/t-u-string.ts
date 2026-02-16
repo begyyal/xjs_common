@@ -80,6 +80,10 @@ mt.appendUnit("asUsd", function (this: TestUnit) {
         const usd = UString.asUsd(null);
         this.check(usd === "", () => `actual => ${usd}`);
     });
+    this.appendCase("handle negative.", function (this: TestCase) {
+        const jpy = UString.asUsd(-100);
+        this.check(jpy === "-$100", () => `actual => ${jpy}`);
+    });
 });
 mt.appendUnit("asJpy", function (this: TestUnit) {
     this.appendCase("basic functionality", function (this: TestCase) {
