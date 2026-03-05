@@ -58,14 +58,15 @@ export function retry<T>(cb: () => Promise<T>, op?: AsyncRetryOption): Promise<T
 export function retry<T>(cb: () => MaybePromise<T>, op?: SyncRetryOption | AsyncRetryOption): MaybePromise<T> {
     const l = op?.logger ?? console;
     const initialCount = op?.count ?? 1;
-    const handleError = (e: any) => {
-        if (op?.errorCriterion && !op.errorCriterion(e)) return false;
-        l.warn(e); return true;
-    };
+    const handleError = (e: any) => !op?.errorCriterion || op.errorCriterion(e);
     const prcs = (c: number, e?: any) => {
         if (c < 0) {
-            l.error("failure exceeds retryable count.");
-            throw e ?? new XjsErr(s_errCode, "failure exceeds retryable count.");
+            l.error("[XJS] failure exceeds retryable count.");
+            throw e ?? new XjsErr(s_errCode, "failure exceeds retryable count.", e);
+        }
+        if (e) {
+            l.warn(`[XJS] it does retry of ${initialCount - c}th time to the call back.`);
+            l.warn(e);
         }
         let ret = null;
         const innerPrcs = () => {
