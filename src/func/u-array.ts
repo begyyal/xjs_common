@@ -1,7 +1,10 @@
 import { AlmostArray } from "../const/types";
+import { XjsErr } from "../obj/xjs-err";
 import { Array2 } from "./array2";
 import { int2array } from "./u";
 import { UType } from "./u-type";
+
+const s_errCode = 40;
 
 export namespace UArray {
     /** 
@@ -80,15 +83,33 @@ export namespace UArray {
         const idx = array.indexOf(v);
         if (idx !== -1) array.splice(idx, 1);
     }
-    export function randomPick<T>(array: T[], takeout: boolean = true): T {
-        const i = Math.floor(array.length * Math.random());
-        const r = array[i];
-        if (takeout) array.splice(i, 1);
-        return r;
+    /**
+     * pick up an element (or elements) randomly from an array.
+     * @param array an array to be processed.
+     * @param op.takeout remove the element picked up from the array. default is true.
+     * @param op.count number of the elements picked up.
+     * @param op.allowDup whether allow duplication of the elements picked up. this is only enabled when count option is greater than 1.
+     */
+    export function randomPick<T>(array: T[], op?: { takeout?: boolean }): T;
+    export function randomPick<T>(array: T[], op: { takeout?: boolean, count: 1 }): T;
+    export function randomPick<T>(array: T[], op: { takeout?: boolean, allowDup?: boolean, count: number }): T[]
+    export function randomPick<T>(arg_array: T[], op?: { takeout?: boolean, allowDup?: boolean, count?: number }): T | T[] {
+        if (arg_array.length === 0) throw new XjsErr(s_errCode, "it couldn't pick up an element from emtpy array.");
+        const takeout = op?.takeout ?? true, count = op?.count ?? 1, allowDup = op?.allowDup ?? false;
+        if (!allowDup && count > arg_array.length)
+            throw new XjsErr(s_errCode, "despite allowDup is false, length of the array is less than count.");
+        const array = takeout ? arg_array : [...arg_array];
+        if (count === 1) return array.splice(Math.floor(array.length * Math.random()), 1)[0];
+        let indexes = int2array(count)
+            .map(i => Math.floor((allowDup ? array.length : array.length - i) * Math.random()));
+        if (allowDup) {
+            const ret = indexes.map(i => array[i]);
+            if (takeout) UArray.distinct(indexes).forEach(i => array.splice(i, 1));
+            return ret;
+        } else return indexes.map(i => array.splice(i, 1)[0]);
     }
     export function shuffle<T>(array: T[]): T[] {
-        const cp = [...array];
-        return int2array(array.length).map(_ => randomPick(cp));
+        return randomPick([...array], { count: array.length });
     }
     export function takeOut<T>(array: T[], filter: (v: T, i?: number) => boolean): T[] {
         const result = [];

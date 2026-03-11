@@ -1,6 +1,7 @@
-import { AlmostArray } from "../const/types";
+import { AlmostArray, Type } from "../const/types";
 import { delay, int2array } from "../func/u";
 import { UArray } from "../func/u-array";
+import { UType } from "../func/u-type";
 import { genIF_A } from "./func/u";
 import { IF_A } from "./obj/if-common";
 import { ModuleTest } from "./prc/module-test";
@@ -122,16 +123,28 @@ mt.appendUnit("randomPick", function (this: TestUnit<{
     this.chainContextGen(_ => ({ array: int2array(10) }));
     this.chainContextGen(c => ({ before: c.array.length }));
     this.appendCase("takeout option works as false.", function (this: TestCase, c) {
-        UArray.randomPick(c.array, false);
-        this.check(c.array.length === c.before);
+        const res = UArray.randomPick(c.array, { takeout: false });
+        this.check(c.array.length === c.before && !UType.isArray(res));
     });
     this.appendCase("picked element is removed from an array.", function (this: TestCase, c) {
         UArray.randomPick(c.array);
         this.check(c.array.length < c.before);
     });
     this.appendCase("check randomization.", function (this: TestCase, c) {
-        const manyTimes = int2array(100).map(_ => UArray.randomPick(c.array, false));
+        const manyTimes = int2array(100).map(_ => UArray.randomPick(c.array, { takeout: false }));
         this.check(UArray.distinct(manyTimes).length > 1);
+    });
+    this.appendCase("count option works correctly.", function (this: TestCase, c) {
+        const res = UArray.randomPick(c.array, { count: 2 });
+        this.check(UType.isArray(res, Type.number) && res.length === 2);
+    });
+    this.appendCase("allowDup option works correctly.", function (this: TestCase, c) {
+        const res = UArray.randomPick(c.array, { count: 11, allowDup: true });
+        this.check(UArray.duplicate(res).length > 0);
+    });
+    this.appendCase("the result doesn't contain duplication of elements.", function (this: TestCase, c) {
+        const res = UArray.randomPick(c.array, { count: 10 });
+        this.check(UArray.duplicate(res).length === 0);
     });
 });
 mt.appendUnit("shuffle", function (this: TestUnit<{

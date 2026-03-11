@@ -190,6 +190,7 @@ XJS throws error with `code` property which has one of the following numbers.
 |10|`func/u`|
 |20|`func/u-string`|
 |30|`func/u-type` (include `func/decorator/d-type`) |
+|40|`func/u-array` |
 |100|`func/decorator/exclusive`|
 
 # License
