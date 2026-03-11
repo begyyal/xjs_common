@@ -4,15 +4,15 @@ import { delay } from "../u";
 const s_errCode = 100;
 
 /**
- * applies transation to the method. **note that the method must return a `Promise`**.
+ * make the method exclusive in the process. **note that the method must return a `Promise`**.
  * @param op.timeoutSec default is `30`.
  */
-export function transaction(op?: {
+export function exclusive(op?: {
     timeoutSec?: number
 }) {
     let lock = 0;
     const timeoutSec = op?.timeoutSec ?? 30;
-    return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
+    return (_target: any, _propertyKey: string, descriptor: PropertyDescriptor) => {
         const method = descriptor.value!;
         async function exe(this: any, ...p: any) {
             const timelimit = Date.now() + timeoutSec * 1000;
