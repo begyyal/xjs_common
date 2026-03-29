@@ -106,10 +106,14 @@ mt.appendUnit("manipulateProperties", function (this: TestUnit<{
         this.expectError();
         UObj.manipulateProperties(c.class_a, p => p.toString(), { ignoreEmpty: false });
     });
-    this.appendCase("recursive option works.", function (this: TestCase, c) {
+    this.appendCase("recursive option works as false.", function (this: TestCase, c) {
         const q = c.class_a.cls_b.q;
         UObj.manipulateProperties(c.class_a, p => p.toString() + "test", { recursive: false });
         this.check(c.class_a.cls_b.q !== q + "test");
+    });
+    this.appendCase("manipulate object property.", function (this: TestCase, c) {
+        UObj.manipulateProperties(c.class_a, p => { p["aaaa"] = 1; return p; }, { recursive: false, targetType: Type.object });
+        this.check(c.class_a.cls_b["aaaa"] === 1);
     });
     this.appendCase("targetType option works.", function (this: TestCase, c) {
         const a = c.class_a.a;
