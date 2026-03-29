@@ -1,6 +1,7 @@
 import { AlmostArray, Type } from "../const/types";
 import { delay, int2array } from "../func/u";
 import { UArray } from "../func/u-array";
+import { UString } from "../func/u-string";
 import { UType } from "../func/u-type";
 import { genIF_A } from "./func/u";
 import { IF_A } from "./obj/if-common";
@@ -173,16 +174,20 @@ mt.appendUnit("chop", function (this: TestUnit) {
 });
 mt.appendUnit("parallelForEach", function (this: TestUnit) {
     this.appendCase("basic functionality", async function (this: TestCase) {
-        const before = Date.now();
-        await UArray.parallelForEach([1, 1, 1], n => delay(n));
-        const msec = Date.now() - before;
-        this.check(msec >= 1000 && msec < 2000, () => `${msec} mill seconds.`);
-    }, { concurrent: true });
+        const ary = [];
+        await UArray.parallelForEach([1, 2, 3], async n => {
+            ary.push(n);
+            await delay(0.1).then(() => ary.push(n));
+        });
+        this.check(UArray.eq(ary, [1, 2, 3, 1, 2, 3], { sort: false }), () => `actual => ${ary}`);
+    });
     this.appendCase("set parallel count.", async function (this: TestCase) {
-        const before = Date.now();
-        await UArray.parallelForEach([1, 1, 1], n => delay(n), 2);
-        const msec = Date.now() - before;
-        this.check(msec >= 2000 && msec < 3000, () => `${msec} mill seconds.`);
-    }, { concurrent: true });
+        const ary = [];
+        await UArray.parallelForEach([1, 2, 3], async n => {
+            ary.push(n);
+            await delay(0.1).then(() => ary.push(n));
+        }, 2);
+        this.check(UArray.eq(ary, [1, 2, 1, 3, 2, 3], { sort: false }), () => `actual => ${ary}`);
+    });
 });
 export const T_UArray = mt;

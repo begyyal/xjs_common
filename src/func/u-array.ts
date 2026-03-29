@@ -121,9 +121,11 @@ export namespace UArray {
         return result;
     }
     export async function parallelForEach<T, R>(array: T[], predicate: (e: T) => Promise<R>, paraCount: number = 3): Promise<R[]> {
-        let ret = [];
-        for (const set of UArray.chop(array, paraCount))
-            ret.push(...(await Promise.all(set.map(predicate))).filter(UType.isDefined));
-        return ret;
+        let ret = [], queues = [...array];
+        const consume = async () => {
+            while (queues.length > 0) ret.push(await predicate(queues.shift()));
+        };
+        await Promise.all(int2array(paraCount).map(() => consume()));
+        return ret.filter(UType.isDefined);
     }
 }
