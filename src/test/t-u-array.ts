@@ -160,6 +160,12 @@ mt.appendUnit("shuffle", function (this: TestUnit<{
     this.appendCase("basic functionality", function (this: TestCase, c) {
         this.check(!UArray.eq(c.ret, c.array, { sort: false }));
     });
+    this.clearContextGen();
+    this.chainContextGen(_ => ({ array: int2array(1) }));
+    this.chainContextGen(c => ({ ret: UArray.shuffle(c.array) }));
+    this.appendCase("returns array type even if the array length is less than one.", function (this: TestCase, c) {
+        this.check(UType.isArray(c.ret, Type.number));
+    });
 });
 mt.appendUnit("chop", function (this: TestUnit) {
     this.appendCase("basic functionality", function (this: TestCase) {

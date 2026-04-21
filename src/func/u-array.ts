@@ -109,7 +109,7 @@ export namespace UArray {
         } else return indexes.map(i => array.splice(i, 1)[0]);
     }
     export function shuffle<T>(array: T[]): T[] {
-        return randomPick([...array], { count: array.length });
+        return array.length <= 1 ? [...array] : randomPick([...array], { count: array.length });
     }
     export function takeOut<T>(array: T[], filter: (v: T, i?: number) => boolean): T[] {
         const result = [];
