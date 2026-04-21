@@ -69,7 +69,7 @@ auth_header="${auth_header}oauth_timestamp=\"${timestamp}\","
 auth_header="${auth_header}oauth_token=\"${oauth_token}\","
 auth_header="${auth_header}oauth_version=\"1.0\""
 
-curl -X POST $url \
+curl --fail -D - -X POST $url \
   -H "$auth_header" \
   -H "content-type: application/json" \
   -d @$data_json_file

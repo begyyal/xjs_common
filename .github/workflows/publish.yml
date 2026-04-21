@@ -31,15 +31,16 @@ jobs:
         git push origin ${{ inputs.version }} -f
     - name: Publish
       run: npm publish --provenance --access public --tag ${{ github.ref_name == 'main' && 'latest' || 'alpha' }}
-    - name: Post tweet
-      run: |
-        ./tool/tweet_template.sh \
-        ${{ inputs.version }} \
-        ${{ github.event.repository.html_url }} > ./data_temp
-        ./tool/tweet.sh \
-        ${{ secrets.TW_CONS_KEY }} \
-        ${{ secrets.TW_CONS_SECRET }} \
-        ${{ secrets.TW_OAUTH_TOKEN }} \
-        ${{ secrets.TW_OAUTH_SECRET }} \
-        ./data_temp
+    # 202604: an access was blocked from twitter api through cloudflare.
+    # - name: Post tweet
+    #   run: |
+    #     ./tool/tweet_template.sh \
+    #     ${{ inputs.version }} \
+    #     ${{ github.event.repository.html_url }} > ./data_temp
+    #     ./tool/tweet.sh \
+    #     ${{ secrets.TW_CONS_KEY }} \
+    #     ${{ secrets.TW_CONS_SECRET }} \
+    #     ${{ secrets.TW_OAUTH_TOKEN }} \
+    #     ${{ secrets.TW_OAUTH_SECRET }} \
+    #     ./data_temp
 
