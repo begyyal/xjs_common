@@ -1,4 +1,4 @@
-import { IndexSignature, MaybeArray } from "../const/types";
+import { IndexSignature, MaybeArray, NormalRecord } from "../const/types";
 import { UType } from "./u-type";
 
 export namespace Array2 {
@@ -22,17 +22,19 @@ export namespace Array2 {
         return map;
     }
     /**
-     * generate a record object which is mapped by specified keys or values with pair of the entry generated from generator.
-     * @param keyOrValues keys or values to be contained in the object.
-     * @param op.kgen key generator. if pass this, `keyOrValues` is treated as values.
-     * @param op.vgen value generator. if pass this, `keyOrValues` is treated as keys.
+     * generate a record object from an array and mapping functions.
+     * @param array entries to be mapped in the object. if only one generator option is specified, this is treated as keys or values.
+     * @param op.kgen key generator. if you pass only this, `array` is treated as values.
+     * @param op.vgen value generator. if you pass only this, `array` is treated as keys.
      */
-    export function record<K extends IndexSignature, V>(keyOrValues: K[], op: { vgen: (k: K) => V }): Record<K, V>;
-    export function record<K extends IndexSignature, V>(keyOrValues: V[], op: { kgen: (v: V) => K }): Record<K, V>;
-    export function record<K extends IndexSignature, V>(keyOrValues: (K[] | V[]), op: { kgen?: (v: V) => K, vgen?: (k: K) => V }): Record<K, V> {
-        return keyOrValues.reduce(!!op.kgen
-            ? (o, korv) => { o[op.kgen(korv as V)] = korv as V; return o; }
-            : (o, korv) => { o[korv as K] = op.vgen(korv as K); return o; }, {} as Record<K, V>);
+    export function record<K extends IndexSignature, V, E>(array: E[], op: { kgen: (e: E) => K, vgen: (e: E) => V }): Record<K, V>;
+    export function record<K extends IndexSignature, V>(array: V[], op: { kgen: (v: V) => K }): Record<K, V>;
+    export function record<K extends IndexSignature, V>(array: K[], op: { vgen: (k: K) => V }): Record<K, V>;
+    export function record<K extends IndexSignature, V, E>(array: (K[] | V[] | E[]), op: { kgen?: (e: V | E) => K, vgen?: (e: K | E) => V }): Record<K, V> {
+        return array.reduce((o, e) => {
+            const k = op.kgen ? op.kgen(e as V | E) : e as K, v = op.vgen ? op.vgen(e as K | E) : e as V;
+            o[k] = v; return o;
+        }, {} as Record<K, V>);
     }
     /** 
      * sum up numbers in the array. if the array is empty, this returns `0`. 

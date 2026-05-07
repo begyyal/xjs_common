@@ -31,9 +31,13 @@ mt.appendUnit("record", function (this: TestUnit<{
         const o = Array2.record(c.numary, { vgen: n => n + "a" });
         this.check(c.numary.every(n => o[n] === n + "a"));
     });
-    this.appendCase("pass values with kgen.", function (this: TestCase, c) {
+    this.appendCase("pass values.", function (this: TestCase, c) {
         const o = Array2.record(c.numary, { kgen: n => n + "a" });
         this.check(c.numary.every(n => o[n + "a"] === n));
+    });
+    this.appendCase("pass entries.", function (this: TestCase, c) {
+        const o = Array2.record(c.numary.map(n => [n, n + "v"] as [number, string]), { kgen: e => e[0], vgen: e => e[1] + "2" });
+        this.check(c.numary.every(n => o[n] === n + "v2"));
     });
 });
 mt.appendUnit("sum", function (this: TestUnit) {
