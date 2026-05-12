@@ -9,6 +9,7 @@ export * from "./func/u-string";
 export * from "./func/u-array";
 export * from "./func/u-http";
 export * from "./func/u-type";
+export * from "./func/u-enum";
 export * from "./func/array2";
 export * from "./func/decorator/exclusive";
 export { DType } from "./func/decorator/d-type";
