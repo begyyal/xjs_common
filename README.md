@@ -19,10 +19,8 @@ import { delay, int2array, UHttp, retry, MaybeArray, Loggable, valueof } from "x
 (async () => {
     // await 3 seconds.
     await delay(3);
-
     // [ 0, 1, 2, 3, 4 ]
     console.log(int2array(5));
-
     // runs callback with customizable retry.
     retry(async () => { }, { count: 2 });
 
@@ -35,9 +33,11 @@ import { delay, int2array, UHttp, retry, MaybeArray, Loggable, valueof } from "x
     console.log(UHttp.isHttpSuccess(204));
     // https://aaa.com?p1=a&p2=1&p2=2
     console.log(UHttp.concatParamsWithEncoding("https://aaa.com", { p1: "a", p2: ["1", "2"] }));
+
+    enum EnumA { A = 1, B = "b", C = "3" }
+    console.log(UEnum.values(EnumA)); // [1, "b", "3"]
     // checks and casts a value like enum valueof.
-    enum EnumA { A = "a", B = "b" }
-    const e: EnumA = valueof(EnumA, "a");
+    const e: EnumA = UEnum.valueof(EnumA, "b");
 })();
 ```
 ### Array utilities.

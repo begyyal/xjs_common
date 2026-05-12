@@ -1,6 +1,7 @@
 import { T_Array2 } from "./t-array2";
 import { T_U } from "./t-u";
 import { T_UArray } from "./t-u-array";
+import { T_UEnum } from "./t-u-enum";
 import { T_UObj } from "./t-u-obj";
 import { T_UString } from "./t-u-string";
 import { T_UType } from "./t-u-type";
@@ -13,6 +14,7 @@ import { T_UType } from "./t-u-type";
         T_UObj,
         T_UString,
         T_UType,
+        T_UEnum,
         T_Array2
     ]) await u.exe();
     console.timeEnd("total time");

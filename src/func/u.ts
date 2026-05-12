@@ -5,9 +5,9 @@ import { UType } from "./u-type";
 
 const s_errCode = 10;
 
-export function getJSTDate(d?: Date | number): Date {
+export function getJSTDate(utc?: Date | number): Date {
     const adjuster = 9 * 60 * 60 * 1000;
-    return UType.isNumber(d) ? new Date(d + adjuster) : new Date((d ? d.getTime() : Date.now()) + adjuster);
+    return UType.isNumber(utc) ? new Date(utc + adjuster) : new Date((utc ? utc.getTime() : Date.now()) + adjuster);
 }
 export function delay(sec: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, 1000 * sec));
@@ -88,20 +88,6 @@ export function retry<T>(cb: () => MaybePromise<T>, op?: SyncRetryOption | Async
         return chain(innerPrcs);
     };
     return prcs(initialCount);
-}
-/**
- * this checks whether the object (**mainly enum**) has the value or not.  
- * if true this returns the value as value type of the object.  
- * ```js
- * enum EnumA {
- *   A = "a",
- *   B = "b"
- * }
- * const enm: EnumA = valueof(EnumA, "a");
- * ```
- */
-export function valueof<E extends { [k: string]: IndexSignature }>(o: E, v: IndexSignature): (typeof o)[keyof typeof o] {
-    return Object.values(o).find(v2 => v2 === v) as (typeof o)[keyof typeof o];
 }
 export function toMsec(value: number, unit: TimeUnit.Sec | TimeUnit.Min | TimeUnit.Hour | TimeUnit.Day): number {
     let v = value;
