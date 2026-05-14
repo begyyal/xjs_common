@@ -5,6 +5,12 @@ import { TestCase } from "./prc/test-case";
 import { TestUnit } from "./prc/test-unut";
 
 const mt = new ModuleTest("T_UString");
+mt.appendUnit("eq", function (this: TestUnit) {
+    this.appendCase("ignore case.", function (this: TestCase) {
+        const a = "aBc", b = "abc";
+        this.check(UString.eq(a, b, { ignoreCace: true }) && !UString.eq(a, b));
+    });
+});
 mt.appendUnit("is_yyyyMMddhhmmss", function (this: TestUnit) {
     this.appendCase("valid format", function (this: TestCase) {
         this.check(UString.is_yyyyMMddhhmmss("20251231235959"));

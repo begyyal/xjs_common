@@ -6,8 +6,10 @@ import { UType } from "./u-type";
 const s_errCode = 20;
 
 export namespace UString {
-    export function eq(s1: string, s2: string): boolean {
-        return !UType.isString(s1) || !UType.isString(s2) ? s1 === s2 : s1.trim() === s2.trim();
+    export function eq(s1: string, s2: string, op?: { ignoreCace?: boolean }): boolean {
+        const _ignoreCase = !!op?.ignoreCace;
+        const v1 = _ignoreCase ? s1.toLowerCase() : s1, v2 = _ignoreCase ? s2.toLowerCase() : s2;
+        return !UType.isString(v1) || !UType.isString(v2) ? v1 === v2 : v1.trim() === v2.trim();
     }
     export function repeat(token: string, mlt: number): string {
         return int2array(mlt).map(_ => token).join("");
