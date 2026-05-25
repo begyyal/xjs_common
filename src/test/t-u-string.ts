@@ -133,4 +133,14 @@ mt.appendUnit("repeat", function (this: TestUnit) {
         this.check(actual === expected, () => `expected => ${expected} / actual => ${actual}`);
     });
 });
+mt.appendUnit("camel2snake", function (this: TestUnit) {
+    this.appendCase("basic functionality", function (this: TestCase) {
+        this.check(UString.camel2snake("abCdEf!") === "ab_cd_ef!");
+    });
+});
+mt.appendUnit("snake2camel", function (this: TestUnit) {
+    this.appendCase("basic functionality", function (this: TestCase) {
+        this.check(UString.snake2camel("ab_cd_ef_!") === "abCdEf!");
+    });
+});
 export const T_UString = mt;

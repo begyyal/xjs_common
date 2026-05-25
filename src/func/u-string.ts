@@ -48,6 +48,12 @@ export namespace UString {
         return az.toLowerCase().split("").map(c => c.charCodeAt(0) - 97).reverse()
             .map((idx, i) => (idx + 1) * (26 ** i)).reduce((v1, v2) => v1 + v2) - 1;
     }
+    export function camel2snake(camel: string): string {
+        return camel?.replaceAll(/[A-Z]/g, c => "_" + c.toLowerCase());
+    }
+    export function snake2camel(snake: string): string {
+        return snake?.replaceAll(/_./g, c => c.charAt(1).toUpperCase());
+    }
     function asAmount(amount: number, unit: string): string {
         const int2dec = Math.abs(amount).toString().split(".");
         const etni = int2dec[0].split("").reverse().join("");
