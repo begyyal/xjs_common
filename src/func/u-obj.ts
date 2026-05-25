@@ -1,4 +1,4 @@
-import { Ctor, IndexSignature, MaybeArray, NonObject, NormalRecord, Type } from "../const/types";
+import { Ctor, IndexSignature, MaybeArray, NormalRecord, Type } from "../const/types";
 import { DType, smbl_tm, TypeMap } from "./decorator/d-type";
 import { UType } from "./u-type";
 

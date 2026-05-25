@@ -91,4 +91,11 @@ export namespace DType {
         }
         Object.defineProperty(target, smbl_tm, { value: map, configurable: true });
     }
+    /**
+     * returns decorated property keys with {@link DType}.
+     */
+    export function keys(ctor: Ctor): string[] {
+        const tm = new ctor()[smbl_tm];
+        return tm ? Object.keys(tm) : [];
+    }
 }

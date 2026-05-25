@@ -77,3 +77,4 @@ export class CLS_C extends CLS_Base implements IF_C {
         this.ary = ary;
     }
 }
+export class CLS_X { }

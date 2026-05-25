@@ -1,4 +1,5 @@
 import { T_Array2 } from "./t-array2";
+import { T_DType } from "./t-d-type";
 import { T_U } from "./t-u";
 import { T_UArray } from "./t-u-array";
 import { T_UEnum } from "./t-u-enum";
@@ -15,7 +16,8 @@ import { T_UType } from "./t-u-type";
         T_UString,
         T_UType,
         T_UEnum,
-        T_Array2
+        T_Array2,
+        T_DType
     ]) await u.exe();
     console.timeEnd("total time");
 })().catch((e: Error) => {
