@@ -1,4 +1,5 @@
 import { TimeUnit } from "../const/time-unit";
+import { int2array } from "../func/u";
 import { UString } from "../func/u-string";
 import { ModuleTest } from "./prc/module-test";
 import { TestCase } from "./prc/test-case";
@@ -141,6 +142,11 @@ mt.appendUnit("camel2snake", function (this: TestUnit) {
 mt.appendUnit("snake2camel", function (this: TestUnit) {
     this.appendCase("basic functionality", function (this: TestCase) {
         this.check(UString.snake2camel("ab_cd_ef_!") === "abCdEf!");
+    });
+});
+mt.appendUnit("generateRandomString", function (this: TestUnit) {
+    this.appendCase("includes alphabet and number only.", function (this: TestCase) {
+        this.check(int2array(100).every(_ => !!UString.generateRandomString(100).match(/^[a-zA-Z0-9]+$/)));
     });
 });
 export const T_UString = mt;

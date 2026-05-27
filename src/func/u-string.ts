@@ -30,7 +30,7 @@ export namespace UString {
             let rnd = Math.floor(62 * Math.random());
             const remain = rnd - 52;
             if (remain >= 0) return remain.toString();
-            if (rnd > 26) rnd += 6;
+            if (rnd > 25) rnd += 6;
             return String.fromCharCode(rnd + 65);
         }).join("");
     }
