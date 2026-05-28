@@ -126,4 +126,18 @@ mt.appendUnit("manipulateProperties", function (this: TestUnit<{
         this.check(c.class_a.a.toString() === a + "test" && c.class_a.b === b);
     });
 });
+mt.appendUnit("truncate", function (this: TestUnit) {
+    this.appendCase("truncate a plain object.", function (this: TestCase) {
+        const obj = { id: 1, a: null, b: null };
+        this.check(UArray.eq(Object.keys(UObj.truncate(obj)), ["id"]));
+    });
+    this.appendCase("truncate a class object decorated with required.", function (this: TestCase) {
+        const cls = new CLS_A(null, 2, null);
+        this.check(UArray.eq(Object.keys(UObj.truncate(cls)), ["id", "a"]));
+    });
+    this.appendCase("truncate an object with a schema.", function (this: TestCase) {
+        const obj = { id: null, a: 2, b: null };
+        this.check(UArray.eq(Object.keys(UObj.truncate(obj, CLS_A)), ["id", "a"]));
+    });
+});
 export const T_UObj = mt;

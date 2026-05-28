@@ -55,6 +55,16 @@ export namespace UObj {
         return o;
     }
     /**
+     * delete empty (`null` or `undefined`) properties excluding propeties decorated with {@link DType.required}.
+     * @param o an object to be truncated.
+     * @param ctor this is referenced as a decorated schema instead of the object itself.
+     */
+    export function truncate<T extends NormalRecord>(o: T, ctor?: Ctor): T {
+        const tm: TypeMap = (ctor ? new ctor() : o)[smbl_tm], requiredKeys = tm ? Object.keys(tm).filter(k => tm[k].req) : null;
+        Object.keys(o).filter(k => UType.isEmpty(o[k]) && (!requiredKeys || !requiredKeys.includes(k))).forEach(k => delete o[k]);
+        return o;
+    }
+    /**
      * manipulate properties of an object. 
      * as default if the properties contains object, it also manipulates properties of that recursively.
      * @param o object whose properties the process applies to.
