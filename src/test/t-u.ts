@@ -77,12 +77,13 @@ mt.appendUnit("retry", function (this: TestUnit<{
     this.appendCase("intervalSec is working.", async function (this: TestCase, c) {
         try {
             await retry(c.cb, {
-                intervalSec: 0.5,
+                intervalSec: 0.6,
                 intervalPredicate: () => c.array.push(Date.now()),
                 errorCriterion: e => e === 1, logger: s_emptyLogger, count: 2
             });
         } catch { }
-        this.check(c.array[2] - c.array[1] >= 500 && c.array[1] - c.array[0] < 500);
+        this.check(c.array[1] - c.array[0] < 600);
+        this.check(c.array[2] - c.array[1] >= 600);
     });
 }, { concurrent: true });
 mt.appendUnit("toMsec", function (this: TestUnit) {
