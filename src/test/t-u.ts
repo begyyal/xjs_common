@@ -1,5 +1,5 @@
 import { TimeUnit } from "../const/time-unit";
-import { delay, int2array, retry, toMsec } from "../func/u";
+import { delay, int2array, retry, toMsec, waitFor } from "../func/u";
 import { UArray } from "../func/u-array";
 import { s_emptyLogger } from "./const/test-helper";
 import { ModuleTest } from "./prc/module-test";
@@ -17,7 +17,7 @@ mt.appendUnit("int2array", function (this: TestUnit) {
         this.check(int2array(a).length === 3);
     });
 });
-mt.appendUnit("retry", async function (this: TestUnit<{
+mt.appendUnit("retry", function (this: TestUnit<{
     ret: any,
     counter: number,
     errorCount: number,
@@ -94,7 +94,7 @@ mt.appendUnit("retry", async function (this: TestUnit<{
         } catch { }
         this.check(c.array[2] - c.array[1] >= 500 && c.array[1] - c.array[0] < 500);
     });
-});
+}, { concurrent: true });
 mt.appendUnit("toMsec", function (this: TestUnit) {
     this.appendCase("convert seconds.", function (this: TestCase) {
         this.check(toMsec(3, TimeUnit.Sec) === 3000);
@@ -109,4 +109,17 @@ mt.appendUnit("toMsec", function (this: TestUnit) {
         this.check(toMsec(3, TimeUnit.Day) === 3 * 1000 * 60 * 60 * 24);
     });
 });
+mt.appendUnit("waitFor", function (this: TestUnit) {
+    this.appendCase("basic functionality.", async function (this: TestCase) {
+        let a = 0;
+        setTimeout(() => a = 1, 100);
+        await waitFor(() => a > 0);
+        this.check(a === 1);
+    });
+    this.appendCase("timeout occurs.", async function (this: TestCase) {
+        let a = 0;
+        this.expectError();
+        await waitFor(() => a > 0, { timeoutMsec: 100 });
+    });
+}, { concurrent: true });
 export const T_U = mt;

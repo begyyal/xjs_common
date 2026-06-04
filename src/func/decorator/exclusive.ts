@@ -1,5 +1,6 @@
+import { TimeUnit } from "../../const/time-unit";
 import { XjsErr } from "../../obj/xjs-err";
-import { delay } from "../u";
+import { toMsec, waitFor } from "../u";
 
 const s_errCode = 100;
 
@@ -11,16 +12,14 @@ export function exclusive(op?: {
     timeoutSec?: number
 }) {
     let lock = 0;
-    const timeoutSec = op?.timeoutSec ?? 30;
+    const waitForOp = {
+        timeoutMsec: toMsec(op?.timeoutSec ?? 30, TimeUnit.Sec),
+        thrownIfTimeout: () => new XjsErr(s_errCode, "An exclusive process to execute was already running by other request.")
+    };
     return (_target: any, _propertyKey: string, descriptor: PropertyDescriptor) => {
         const method = descriptor.value!;
         async function exe(this: any, ...p: any) {
-            const timelimit = Date.now() + timeoutSec * 1000;
-            while (lock > 0) {
-                if (timelimit <= Date.now())
-                    throw new XjsErr(s_errCode, "An exclusive process to execute was already running by other request.");
-                await delay(1);
-            }
+            if (lock > 0) await waitFor(() => lock <= 0, waitForOp);
             try {
                 lock++;
                 const ret = method.apply(this, p);

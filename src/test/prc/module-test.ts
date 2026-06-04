@@ -1,4 +1,3 @@
-import { MaybePromise } from "../../const/types";
 import { TestUnit } from "./test-unut";
 
 export class ModuleTest {
@@ -6,11 +5,11 @@ export class ModuleTest {
     constructor(readonly name: string) { }
     appendUnit(
         unitName: string,
-        cb: (this: TestUnit) => MaybePromise<void>,
+        builder: (this: TestUnit) => void,
         op?: { concurrent?: boolean }): TestUnit {
         if (this._units.some(u => u.name === unitName))
             throw Error("duplication of unit name was detected.");
-        const u = new TestUnit(this.name, unitName, cb, op);
+        const u = new TestUnit(this.name, unitName, builder, op);
         this._units.push(u);
         return u;
     }

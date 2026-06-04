@@ -1,5 +1,5 @@
 import { TimeUnit } from "../const/time-unit";
-import { IndexSignature, Loggable, MaybePromise } from "../const/types";
+import { Loggable, MaybePromise } from "../const/types";
 import { XjsErr } from "../obj/xjs-err";
 import { UType } from "./u-type";
 
@@ -96,4 +96,18 @@ export function toMsec(value: number, unit: TimeUnit.Sec | TimeUnit.Min | TimeUn
     if (unit <= TimeUnit.Hour) v *= 60;
     if (unit <= TimeUnit.Day) v *= 24;
     return v;
+}
+export function waitFor(predicete: () => boolean, op?: { timeoutMsec?: number, thrownIfTimeout?: () => any }): Promise<void> {
+    const _timeout = op?.timeoutMsec ?? 30_000;
+    return new Promise((rs, rj) => {
+        let toRj = null, toRs = null;
+        const clear = () => { clearInterval(toRs); clearTimeout(toRj); }
+        toRj = setTimeout(() => {
+            clear();
+            rj(op?.thrownIfTimeout ? op.thrownIfTimeout() : new XjsErr(s_errCode, "time is over in waitFor()."));
+        }, _timeout);
+        toRs = setInterval(() => {
+            if (predicete()) { clear(); rs(); }
+        }, 100);
+    });
 }

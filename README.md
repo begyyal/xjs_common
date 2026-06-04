@@ -14,11 +14,13 @@ if you has been used the features (e.g. `HttpResolver`, `UFile`), please use the
 # Code example (only part)
 ### Miscellaneous utilities.
 ```ts
-import { delay, int2array, UHttp, retry, MaybeArray, Loggable, valueof } from "xjs-common";
+import { delay, waitFor, int2array, UHttp, retry, MaybeArray, Loggable, valueof } from "xjs-common";
 
 (async () => {
     // await 3 seconds.
     await delay(3);
+    // await a predicate returns true with timeout.
+    await waitFor(() => true);
     // [ 0, 1, 2, 3, 4 ]
     console.log(int2array(5));
     // runs callback with customizable retry.
@@ -192,6 +194,7 @@ XJS throws error with `code` property which has one of the following numbers.
 |30|`func/u-type` (include `func/decorator/d-type`) |
 |40|`func/u-array` |
 |100|`func/decorator/exclusive`|
+|500|`prcs/transceiver`|
 
 # License
 [Apache-License](./LICENSE)

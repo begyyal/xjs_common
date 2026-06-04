@@ -11,7 +11,7 @@ export class TestUnit<C = any> {
         readonly moduleName: string,
         readonly name: string,
         builder: (this: TestUnit<C>) => void,
-        readonly op?: { concurrent?: boolean }) {
+        private readonly _op?: { concurrent?: boolean }) {
         builder.bind(this)();
     }
     chainContextGen(cb: (c: Partial<C>) => Partial<C>): void {
@@ -30,7 +30,7 @@ export class TestUnit<C = any> {
         op?: { concurrent?: boolean }): void {
         if (this._cases.some(u => u.name === title))
             throw Error("duplication of test case was detected.");
-        this._cases.push(new TestCase(this.moduleName, this.name, title, cb, this.contextGen, op));
+        this._cases.push(new TestCase(this.moduleName, this.name, title, cb, this.contextGen, op ?? this._op));
     }
     setInitializer(initalizer: () => any | Promise<any>): void {
         this.initalizer = initalizer;
