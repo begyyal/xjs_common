@@ -1,10 +1,8 @@
 import { Array2 } from "../func/array2";
 import { UType } from "../func/u-type";
-import { genIF_A, genIF_B } from "./func/u";
-import { IF_A, IF_B } from "./obj/if-common";
-import { ModuleTest } from "./prc/module-test";
-import { TestCase } from "./prc/test-case";
-import { TestUnit } from "./prc/test-unut";
+import { genIF_A, genIF_B } from "./sample/func/u";
+import { IF_A, IF_B } from "./sample/obj/if-common";
+import { ModuleTest, TestCase, TestUnit } from "xjs-test";
 
 const mt = new ModuleTest("T_Array2");
 mt.appendUnit("map", function (this: TestUnit<{

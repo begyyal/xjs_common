@@ -1,8 +1,6 @@
+import { ModuleTest, TestCase, TestUnit } from "xjs-test";
 import { UEnum } from "../func/u-enum";
-import { EnumA, EnumB, EnumC } from "./const/enum";
-import { ModuleTest } from "./prc/module-test";
-import { TestCase } from "./prc/test-case";
-import { TestUnit } from "./prc/test-unut";
+import { EnumA, EnumB, EnumC } from "./sample/const/enum";
 
 const mt = new ModuleTest("T_UEnum");
 mt.appendUnit("values", function (this: TestUnit) {

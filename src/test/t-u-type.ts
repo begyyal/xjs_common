@@ -1,11 +1,9 @@
+import { ModuleTest, TestCase, TestUnit } from "xjs-test";
 import { Type } from "../const/types";
 import { UArray } from "../func/u-array";
 import { UType } from "../func/u-type";
-import { CLS_A, CLS_B, CLS_C } from "./obj/class-common";
-import { IF_C } from "./obj/if-common";
-import { ModuleTest } from "./prc/module-test";
-import { TestCase } from "./prc/test-case";
-import { TestUnit } from "./prc/test-unut";
+import { CLS_A, CLS_B, CLS_C } from "./sample/obj/class-common";
+import { IF_C } from "./sample/obj/if-common";
 
 const mt = new ModuleTest("T_UType");
 mt.appendUnit("isEmpty", function (this: TestUnit) {

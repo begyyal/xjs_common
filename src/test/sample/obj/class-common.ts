@@ -1,5 +1,5 @@
-import { Type } from "../../const/types";
-import { DType } from "../../func/decorator/d-type";
+import { Type } from "../../../const/types";
+import { DType } from "../../../func/decorator/d-type";
 import { IF_C } from "./if-common";
 
 export abstract class CLS_Base {

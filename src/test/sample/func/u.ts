@@ -1,4 +1,4 @@
-import { int2array } from "../../func/u";
+import { int2array } from "../../../func/u";
 import { CLS_A, CLS_B } from "../obj/class-common";
 import { IF_A, IF_B } from "../obj/if-common";
 
