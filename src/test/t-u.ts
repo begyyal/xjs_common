@@ -82,7 +82,8 @@ mt.appendUnit("retry", function (this: TestUnit<{
                 errorCriterion: e => e === 1, logger: s_emptyLogger, count: 2
             });
         } catch { }
-        this.check(c.array[2] - c.array[1] >= 500 && c.array[1] - c.array[0] < 500);
+        this.check(c.array[1] - c.array[0] < 500);
+        this.check(c.array[2] - c.array[1] >= 500);
     });
 }, { concurrent: true });
 mt.appendUnit("toMsec", function (this: TestUnit) {
