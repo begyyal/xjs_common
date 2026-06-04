@@ -4,6 +4,7 @@
 /src/test*
 !/src/test
 .ghtoken
+.npmrc
 xjs-common-*.tgz
 
 # Compiled output
