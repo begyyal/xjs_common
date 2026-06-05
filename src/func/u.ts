@@ -1,14 +1,9 @@
 import { TimeUnit } from "../const/time-unit";
 import { Loggable, MaybePromise } from "../const/types";
 import { XjsErr } from "../obj/xjs-err";
-import { UType } from "./u-type";
 
 const s_errCode = 10;
 
-export function getJSTDate(utc?: Date | number): Date {
-    const adjuster = 9 * 60 * 60 * 1000;
-    return UType.isNumber(utc) ? new Date(utc + adjuster) : new Date((utc ? utc.getTime() : Date.now()) + adjuster);
-}
 export function delay(sec: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, 1000 * sec));
 }

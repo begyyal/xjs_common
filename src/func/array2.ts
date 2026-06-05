@@ -1,4 +1,4 @@
-import { IndexSignature, MaybeArray, NormalRecord } from "../const/types";
+import { IndexSignature, MaybeArray } from "../const/types";
 import { UType } from "./u-type";
 
 export namespace Array2 {
