@@ -1,7 +1,7 @@
 import { ModuleTest, TestCase, TestUnit } from "xjs-test";
-import { TimeUnit } from "../const/time-unit";
-import { int2array } from "../func/u";
-import { UString } from "../func/u-string";
+import { TimeUnit } from "../../const/time-unit";
+import { int2array } from "../../func/u";
+import { UString } from "../../func/u-string";
 
 const mt = new ModuleTest("T_UString");
 mt.appendUnit("eq", function (this: TestUnit) {

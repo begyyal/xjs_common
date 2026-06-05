@@ -1,7 +1,7 @@
-import { Array2 } from "../func/array2";
-import { UType } from "../func/u-type";
-import { genIF_A, genIF_B } from "./sample/func/u";
-import { IF_A, IF_B } from "./sample/obj/if-common";
+import { Array2 } from "../../func/array2";
+import { UType } from "../../func/u-type";
+import { genIF_A, genIF_B } from "../sample/func/u";
+import { IF_A, IF_B } from "../sample/obj/if-common";
 import { ModuleTest, TestCase, TestUnit } from "xjs-test";
 
 const mt = new ModuleTest("T_Array2");

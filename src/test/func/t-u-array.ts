@@ -1,10 +1,10 @@
 import { ModuleTest, TestCase, TestUnit } from "xjs-test";
-import { AlmostArray, Type } from "../const/types";
-import { delay, int2array } from "../func/u";
-import { UArray } from "../func/u-array";
-import { UType } from "../func/u-type";
-import { genIF_A } from "./sample/func/u";
-import { IF_A } from "./sample/obj/if-common";
+import { AlmostArray, Type } from "../../const/types";
+import { delay, int2array } from "../../func/u";
+import { UArray } from "../../func/u-array";
+import { UType } from "../../func/u-type";
+import { genIF_A } from "../sample/func/u";
+import { IF_A } from "../sample/obj/if-common";
 
 const mt = new ModuleTest("T_UArray");
 mt.appendUnit("distinct", function (this: TestUnit<{

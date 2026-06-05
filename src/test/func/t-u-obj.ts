@@ -1,10 +1,10 @@
 import { ModuleTest, TestCase, TestUnit } from "xjs-test";
-import { Type } from "../const/types";
-import { UArray } from "../func/u-array";
-import { UObj } from "../func/u-obj";
-import { genCLS_A, genCLS_B, genIF_A, genIF_B } from "./sample/func/u";
-import { CLS_A, CLS_B, CLS_C } from "./sample/obj/class-common";
-import { IF_A, IF_B, IF_C } from "./sample/obj/if-common";
+import { Type } from "../../const/types";
+import { UArray } from "../../func/u-array";
+import { UObj } from "../../func/u-obj";
+import { genCLS_A, genCLS_B, genIF_A, genIF_B } from "../sample/func/u";
+import { CLS_A, CLS_B, CLS_C } from "../sample/obj/class-common";
+import { IF_A, IF_B, IF_C } from "../sample/obj/if-common";
 
 const mt = new ModuleTest("T_UObj");
 mt.appendUnit("assignProperties", function (this: TestUnit<{

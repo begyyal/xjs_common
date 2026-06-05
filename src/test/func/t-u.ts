@@ -1,7 +1,7 @@
 import { ModuleTest, s_emptyLogger, TestCase, TestUnit } from "xjs-test";
-import { TimeUnit } from "../const/time-unit";
-import { delay, int2array, retry, toMsec, waitFor } from "../func/u";
-import { UArray } from "../func/u-array";
+import { TimeUnit } from "../../const/time-unit";
+import { delay, int2array, retry, toMsec, waitFor } from "../../func/u";
+import { UArray } from "../../func/u-array";
 
 const mt = new ModuleTest("T_U");
 mt.appendUnit("int2array", function (this: TestUnit) {
