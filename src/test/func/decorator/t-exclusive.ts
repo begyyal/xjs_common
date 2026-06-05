@@ -30,10 +30,10 @@ mt.appendUnit("exclusive", function (this: TestUnit<{ cls: Cls }>) {
         this.check(UArray.eq(c.cls.array, [1, 2], { sort: false }));
     });
     this.appendCase("semaphore works correctly.", async function (this: TestCase, c) {
-        c.cls.exe_smp2(1, 1);
+        c.cls.exe_smp2(2, 1);
         c.cls.exe_smp2(0.5, 2);
         await c.cls.exe_smp2(0, 3);
-        this.check(UArray.eq(c.cls.array, [2, 3], { sort: false }));
+        this.check(UArray.eq(c.cls.array, [2, 3], { sort: false }), () => c.cls.array);
     });
     this.appendCase("timeout works correctly.", async function (this: TestCase, c) {
         this.expectError();

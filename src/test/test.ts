@@ -1,16 +1,19 @@
 import { T_Exclusive } from "./func/decorator/t-exclusive";
 import { T_Array2 } from "./func/t-array2";
-import { T_DType } from "./func/t-d-type";
+import { T_DType } from "./func/decorator/t-d-type";
 import { T_U } from "./func/t-u";
 import { T_UArray } from "./func/t-u-array";
 import { T_UEnum } from "./func/t-u-enum";
 import { T_UObj } from "./func/t-u-obj";
 import { T_UString } from "./func/t-u-string";
 import { T_UType } from "./func/t-u-type";
+import { T_Transceiver } from "./prcs/t-transceiver";
 
 (async () => {
     console.time("total time");
-    for (const u of [
+    await Promise.all([
+        T_Exclusive,
+        T_Transceiver,
         T_U,
         T_UArray,
         T_UObj,
@@ -18,9 +21,8 @@ import { T_UType } from "./func/t-u-type";
         T_UType,
         T_UEnum,
         T_Array2,
-        T_DType,
-        T_Exclusive
-    ]) await u.exe();
+        T_DType
+    ].map(u => u.exe()));
     console.timeEnd("total time");
 })().catch((e: Error) => {
     console.error(e);
