@@ -43,6 +43,6 @@
     "@types/node": "^24.2.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
-    "xjs-test": "^1.0.1"
+    "xjs-test": "^1.0.2"
   }
 }
