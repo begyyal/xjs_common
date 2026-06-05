@@ -31,8 +31,9 @@ mt.appendUnit("exclusive", function (this: TestUnit<{ cls: Cls }>) {
     });
     this.appendCase("semaphore works correctly.", async function (this: TestCase, c) {
         c.cls.exe_smp2(1, 1);
-        await c.cls.exe_smp2(0, 2);
-        this.check(UArray.eq(c.cls.array, [2], { sort: false }));
+        c.cls.exe_smp2(0.5, 2);
+        await c.cls.exe_smp2(0, 3);
+        this.check(UArray.eq(c.cls.array, [2, 3], { sort: false }));
     });
     this.appendCase("timeout works correctly.", async function (this: TestCase, c) {
         this.expectError();

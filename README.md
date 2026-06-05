@@ -161,7 +161,8 @@ class Cls_A implements If_A {
 })();
 ```
 ### Make a method exclusive.  
-**NOTE**: this feature uses decorator, so requires `"experimentalDecorators": true` in tsconfig.
+**NOTE**: this feature uses decorator, so requires `"experimentalDecorators": true` in tsconfig.  
+**NOTE**: method to be decorated must return a `Promise`.
 ```ts
 import { exclusive, delay } from "xjs-common";
 
@@ -169,18 +170,19 @@ class Cls {
     constructor() { }
     // default timeout sec is 30.
     @exclusive()
-    async exe1(): Promise<void> {
-    }
+    async exe1(): Promise<void> {}
     @exclusive({ timeoutSec: 3 })
-    async exe2(): Promise<void> {
-        await delay(10);
-    }
+    async exe2(): Promise<void> { await delay(10); }
+    // it can spesifies semaphore value.
+    @exclusive({ timeoutSec: 3, semaphore: 2 })
+    async exe3(): Promise<void> { await delay(10); }
 }
 (async () => {
     const cls = new Cls();
-    await Promise.all([cls.exe2(), cls.exe2()]);
+    await Promise.all([cls.exe3(), cls.exe3()]); // here is no error because semaphore is 2.
+    await Promise.all([cls.exe2(), cls.exe2()]); // get an error here!
 })().catch(e => {
-    // reach here after 3 sec from second call for Cls#exe2().
+    // reach here after about 3 sec from second call for Cls#exe2().
     // XjsErr [Error]: [XJS] An exclusive method to execute was already running by other request.
     console.log(e);
 });
