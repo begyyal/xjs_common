@@ -16,10 +16,10 @@ export class Hall<T> {
     private readonly _takingNotesMsec: number;
     private _qidGen = 1;
     /**
-     * @param op.takingNotesSec queue processing timeout seconds. (what speak is processed sequentially each audience.) default is 30.
+     * @param op.takingNotesMsec queue processing timeout milliseconds. (what speak is processed sequentially each audience.) default is 30 seconds.
      */
-    constructor(op?: { takingNotesSec?: number }) {
-        this._takingNotesMsec = toMsec(op?.takingNotesSec ?? 30, TimeUnit.Sec);
+    constructor(op?: { takingNotesMsec?: number }) {
+        this._takingNotesMsec = op?.takingNotesMsec ?? toMsec(30, TimeUnit.Sec);
     }
     /**
      * speak something to audiences.
@@ -75,24 +75,24 @@ export class Hall<T> {
     /**
      * await attendance of audiences.
      * @param op.count number of audiences to attend. default is 1.
-     * @param op.timeoutSec timeout seconds. default is 30, or `takingNotesSec` if exists.
+     * @param op.timeoutMsec timeout milliseconds. default is 30 seconds, or `takingNotesMsec` if exists.
      */
-    async awaitAudience(op?: { count?: number, timeoutSec?: number }): Promise<void> {
+    async awaitAudience(op?: { count?: number, timeoutMsec?: number }): Promise<void> {
         const _count = op?.count ?? 1;
         await waitFor(() => this._listener.length >= _count, {
-            timeoutMsec: op?.timeoutSec ? toMsec(op.timeoutSec, TimeUnit.Sec) : this._takingNotesMsec,
+            timeoutMsec: op?.timeoutMsec ?? this._takingNotesMsec,
             thrownIfTimeout: () => new XjsErr(s_errCode, "audience was not filled within the time.")
         });
     }
     /**
      * await when the hall breaks up.
-     * @param op.timeoutMin timeout minutes. default is 60.
+     * @param op.timeoutMsec timeout milliseconds. default is an hour.
      */
-    async awaitBreakingUp(op?: { timeoutMin?: number }): Promise<void> {
+    async awaitBreakingUp(op?: { timeoutMsec?: number }): Promise<void> {
         let released = false;
         this.assignCleaner(() => released = true);
         await waitFor(() => released, {
-            timeoutMsec: toMsec(op?.timeoutMin ?? 60, TimeUnit.Min),
+            timeoutMsec: op?.timeoutMsec ?? toMsec(1, TimeUnit.Hour),
             thrownIfTimeout: () => new XjsErr(s_errCode, "xjs hall didn't break up within the time.")
         });
     }

@@ -19,8 +19,9 @@ import { delay, waitFor, int2array, UHttp, retry, MaybeArray, Loggable, valueof 
 (async () => {
     // await 3 seconds.
     await delay(3);
-    // await a predicate returns true with timeout.
-    await waitFor(() => true);
+    // await a second.
+    let a = false; delay(1).then(() => a = true);
+    await waitFor(() => a);
     // [ 0, 1, 2, 3, 4 ]
     console.log(int2array(5));
     // runs callback with customizable retry.
