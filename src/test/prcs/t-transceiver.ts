@@ -37,12 +37,31 @@ mt.appendUnit("transceiver", function (this: TestUnit) {
         this.check(result1 === "3,2,1" && result2 === "3,2,1");
     });
     this.appendCase("send many data async and timeout occur.", async function (this: TestCase) {
-        const trcv = new Transceiver<number>({ timeoutSec: 3 });
+        const trcv = new Transceiver<number>({ timeoutSec: { queue: 3 } });
         trcv.receive(_ => delay(0.1));
         trcv.finalize(() => delay(0.1));
         this.expectError();
         int2array(100).forEach(i => trcv.send(i).catch(() => { }));
         await trcv.release();
+    });
+    this.appendCase("await connection.", async function (this: TestCase) {
+        const trcv = new Transceiver<number>();
+        let con = false;
+        delay(1).then(() => {
+            trcv.receive(() => { });
+            con = true;
+        });
+        await trcv.awaitConnections();
+        this.check(con);
+    });
+    this.appendCase("await release.", async function (this: TestCase) {
+        const trcv = new Transceiver<number>();
+        let rcv = false;
+        trcv.receive(() => delay(1).then(() => rcv = true));
+        trcv.send(1);
+        trcv.release();
+        await trcv.awaitRelease();
+        this.check(rcv);
     });
 }, { concurrent: true });
 export const T_Transceiver = mt;
