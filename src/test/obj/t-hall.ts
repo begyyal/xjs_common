@@ -37,7 +37,7 @@ mt.appendUnit("hall", function (this: TestUnit) {
         this.check(result1 === "3,2,1" && result2 === "3,2,1");
     });
     this.appendCase("send many data async and timeout occur.", async function (this: TestCase) {
-        const hall = new Hall<number>({ takingNotesSec: 3 });
+        const hall = new Hall<number>({ takingNotesMsec: 3_000 });
         hall.attend(_ => delay(0.1));
         hall.assignCleaner(() => delay(0.1));
         this.expectError();
