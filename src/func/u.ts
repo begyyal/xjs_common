@@ -102,7 +102,9 @@ export function waitFor(predicete: () => boolean, op?: { timeoutMsec?: number, t
             rj(op?.thrownIfTimeout ? op.thrownIfTimeout() : new XjsErr(s_errCode, "time is over in waitFor()."));
         }, _timeout);
         toRs = setInterval(() => {
-            if (predicete()) { clear(); rs(); }
+            try {
+                if (predicete()) { clear(); rs(); }
+            } catch (e) { clear(); rj(e); }
         }, 100);
     });
 }

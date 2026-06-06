@@ -7,13 +7,13 @@ import { T_UEnum } from "./func/t-u-enum";
 import { T_UObj } from "./func/t-u-obj";
 import { T_UString } from "./func/t-u-string";
 import { T_UType } from "./func/t-u-type";
-import { T_Transceiver } from "./prcs/t-transceiver";
+import { T_Hall } from "./obj/t-hall";
 
 (async () => {
     console.time("total time");
     await Promise.all([
         T_Exclusive,
-        T_Transceiver,
+        T_Hall,
         T_U,
         T_UArray,
         T_UObj,

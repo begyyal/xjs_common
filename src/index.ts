@@ -15,5 +15,4 @@ export * from "./func/decorator/exclusive";
 export { DType } from "./func/decorator/d-type";
 
 export * from "./obj/xjs-err";
-
-export * from "./prcs/transceiver";
+export * from "./obj/hall";

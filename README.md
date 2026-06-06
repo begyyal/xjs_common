@@ -42,7 +42,8 @@ import { delay, waitFor, int2array, UHttp, retry, MaybeArray, Loggable, valueof 
     const e: EnumA = UEnum.valueof(EnumA, "b");
 })();
 ```
-### Array utilities.
+### [UArray](https://github.com/begyyal/xjs_common/tree/main/src/func/u-array.ts)
+#### array utilities.
 ```ts
 import { UArray } from "xjs-common";
 
@@ -73,7 +74,8 @@ import { UArray } from "xjs-common";
     console.log(UArray.randomPick(ary3));
 })();
 ```
-### String utilities.
+### [UString](https://github.com/begyyal/xjs_common/tree/main/src/func/u-string.ts)
+#### string utilities.
 ```ts
 import { UString } from "xjs-common";
 
@@ -97,7 +99,8 @@ import { UString } from "xjs-common";
     console.log(UString.simpleTime({ date: getJSTDate(), unit: TimeUnit.Day }));
 })();
 ```
-### Validate and crop object properties with annotation.  
+### [@DType](https://github.com/begyyal/xjs_common/tree/main/src/func/decorator/d-type.ts)
+#### validate, crop, and collect object properties decorated with @DType.  
 **NOTE**: this feature uses decorator, so requires `"experimentalDecorators": true` in tsconfig.  
 **NOTE**: some functionalities  in this feature are based on `"useDefineForClassFields": true` in tsconfig.  
 this flag is true by default at the target higher than `ES2022`, [here is for more](https://www.typescriptlang.org/tsconfig/#useDefineForClassFields).
@@ -126,6 +129,9 @@ class Cls_A implements If_A {
     constructor(substance?: If_A) { Object.assign(this, substance); }
 }
 (() => {
+    // collect property keys decorated with @DType.
+    console.log(DType.keys(Cls_B)); // ["aryB", "boolB"]
+
     const valid_b1: If_B = { aryB: [1, 2, 3], boolB: true, q: 1 };
     const valid_a1: If_A = { id: 1, strA: "a", objA: valid_b1, p: 1 };
 
@@ -160,9 +166,10 @@ class Cls_A implements If_A {
     console.log(UType.validate(invalid5, Cls_A)); // [ 'objA.aryB.0' ]
 })();
 ```
-### Make a method exclusive.  
+### [@exclusive](https://github.com/begyyal/xjs_common/tree/main/src/func/decorator/exclusive.ts)
+#### make a method exclusive.  
 **NOTE**: this feature uses decorator, so requires `"experimentalDecorators": true` in tsconfig.  
-**NOTE**: method to be decorated must return a `Promise`.
+**NOTE**: method to be decorated must returns a `Promise`.
 ```ts
 import { exclusive, delay } from "xjs-common";
 
@@ -187,6 +194,36 @@ class Cls {
     console.log(e);
 });
 ```
+### [Hall](https://github.com/begyyal/xjs_common/tree/main/src/obj/hall.ts)
+#### facilitates data transfer across asynchronous tasks.  
+```ts
+import { int2array, delay, Hall } from "xjs-common";
+
+function dispatchAsyncTask(): Hall<number> {
+    const hall = new Hall<number>();
+    (async () => {
+        for (const _ of int2array(10)) {
+            await hall.awaitAudience(); // await about 3 seconds until a audience attends.
+            hall.speak(1);
+            await delay(1);
+        }
+    })().finally(() => hall.breakUp());
+    return hall;
+}
+(async () => {
+    let sum = 0;
+    const hall = dispatchAsyncTask();
+    await delay(3);
+    hall.assignCleaner(() => sum += 10);
+    hall.attend(async n => {
+        await delay(2);
+        sum += n;
+    });
+    // await about 2*10 seconds until call breakUp() and digest all queues.
+    await hall.awaitBreakingUp(); 
+    console.log(sum); // 20 (1*10 + 10).
+})();
+```
 # Error definition
 XJS throws error with `code` property which has one of the following numbers.
 |code|thrown by|
@@ -196,7 +233,7 @@ XJS throws error with `code` property which has one of the following numbers.
 |30|`func/u-type` (include `func/decorator/d-type`) |
 |40|`func/u-array` |
 |100|`func/decorator/exclusive`|
-|500|`prcs/transceiver`|
+|300|`obj/hall`|
 
 # License
 [Apache-License](./LICENSE)
