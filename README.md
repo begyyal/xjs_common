@@ -48,7 +48,7 @@ import { delay, waitFor, int2array, UHttp, retry, MaybeArray, Loggable, valueof 
 ```ts
 import { UArray } from "xjs-common";
 
-(() => {
+(async () => {
     // [ 1, 3, 2, 5, 4 ]
     const ary1 = UArray.distinct([1, 3, 2, 2, 1, 5, 4]);
     console.log(ary1);
@@ -65,6 +65,9 @@ import { UArray } from "xjs-common";
     console.log(UArray.eq(ary1, ary2));
     // false
     console.log(UArray.eq(ary1, ary2, { sort: false }));
+    // [ 1, 2 ]
+    UArray.remove(ary1, 3);
+    console.log(ary1);
 
     const ary3 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     // [ [ 1, 2, 3 ], [ 4, 5, 6 ], [ 7, 8, 9 ], [ 10 ] ]
@@ -73,6 +76,13 @@ import { UArray } from "xjs-common";
     // randomization.
     console.log(UArray.shuffle(ary3));
     console.log(UArray.randomPick(ary3));
+
+    // output 6 after await 3 seconds.
+    let sum = 0;
+    await UArray.parallelForEach([1, 2, 3], n => delay(n).then(() => sum += n));
+    console.log(sum);
+    // but in this case, await about 4 seconds because count of parrallel is 2.
+    await UArray.parallelForEach([1, 2, 3], n => delay(n), 2);
 })();
 ```
 ### [UString](https://github.com/begyyal/xjs_common/tree/main/src/func/u-string.ts)
@@ -85,19 +95,28 @@ import { UString } from "xjs-common";
     console.log(UString.eq("", null));
     // true
     console.log(UString.eq("tanaka taro", "  tanaka taro  "));
+    // true
+    console.log(UString.eq("Tanaka Taro", "tanaka taro", { ignoreCace: true }));
 
     // e.g. cfNouG0P
     console.log(UString.generateRandomString(8));
 
-    // 26
+    // conversion between alphabet and numeric index.
     console.log(UString.az2idx("AA"));
-    // AA
     console.log(UString.idx2az(26));
+    // conversion between camel and snake cases.
+    console.log(UString.camel2snake("AaaBbb"));
+    console.log(UString.snake2camel("aaa_bbb"));
+
+    // 12.3%
+    console.log(UString.asPercentage(0.123));
+    // $1,000
+    console.log(UString.asUsd(1000));
 
     // e.g. 20250615053513
     console.log(UString.simpleTime());
     // e.g. 20250615
-    console.log(UString.simpleTime({ date: getJSTDate(), unit: TimeUnit.Day }));
+    console.log(UString.simpleTime({ date: new Date(), unit: TimeUnit.Day }));
 })();
 ```
 ### [@DType](https://github.com/begyyal/xjs_common/tree/main/src/func/decorator/d-type.ts)
@@ -203,8 +222,8 @@ import { int2array, delay, Hall } from "xjs-common";
 function dispatchAsyncTask(): Hall<number> {
     const hall = new Hall<number>();
     (async () => {
+        await hall.awaitAudience(); // await about 3 seconds until a audience attends.
         for (const _ of int2array(10)) {
-            await hall.awaitAudience(); // await about 3 seconds until a audience attends.
             hall.speak(1);
             await delay(1);
         }
@@ -220,7 +239,7 @@ function dispatchAsyncTask(): Hall<number> {
         await delay(2);
         sum += n;
     });
-    // await about 2*10 seconds until call breakUp() and digest all queues.
+    // await about 2*10 seconds until call breakUp() and digest all queues sequentially.
     await hall.awaitBreakingUp(); 
     console.log(sum); // 20 (1*10 + 10).
 })();

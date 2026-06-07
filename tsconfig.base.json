@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "es2022",
+    "rootDir": ".",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "removeComments": false,
