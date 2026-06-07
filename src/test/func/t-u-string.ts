@@ -136,6 +136,9 @@ mt.appendUnit("camel2snake", function (this: TestUnit) {
     this.appendCase("basic functionality", function (this: TestCase) {
         this.check(UString.camel2snake("abCdEf!") === "ab_cd_ef!");
     });
+    this.appendCase("convert pascal case.", function (this: TestCase) {
+        this.check(UString.camel2snake("AaaBbb") === "aaa_bbb");
+    });
 });
 mt.appendUnit("snake2camel", function (this: TestUnit) {
     this.appendCase("basic functionality", function (this: TestCase) {
