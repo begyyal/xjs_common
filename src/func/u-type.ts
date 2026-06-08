@@ -13,7 +13,8 @@ export namespace UType {
     export function isBigint(v: any): v is bigint { return typeof v === Type.bigint; }
     export function isBoolean(v: any): v is boolean { return typeof v === Type.boolean; }
     export function isSymbol(v: any): v is symbol { return typeof v === Type.symbol; }
-    export function isObject(v: any): v is object { return typeof v === Type.object; }
+    /** NOTE: object excluding `null`.  */
+    export function isObject(v: any): v is object { return v && typeof v === Type.object; }
     export function isFunction(v: any): v is Function { return typeof v === "function"; }
     export function isArray(v: any, t: Type.string): v is string[];
     export function isArray(v: any, t: Type.number): v is number[];

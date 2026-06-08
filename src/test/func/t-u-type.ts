@@ -108,4 +108,9 @@ mt.appendUnit("isArray", function (this: TestUnit<{
         this.check(UType.isArray(c.array, Type.number));
     });
 });
+mt.appendUnit("isObject", function (this: TestUnit) {
+    this.appendCase("returns false if null.", function (this: TestCase, c) {
+        this.check(!UType.isObject(null));
+    });
+});
 export const T_UType = mt;
