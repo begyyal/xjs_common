@@ -132,6 +132,11 @@ mt.appendUnit("repeat", function (this: TestUnit) {
         this.check(actual === expected, () => `expected => ${expected} / actual => ${actual}`);
     });
 });
+mt.appendUnit("reverse", function (this: TestUnit) {
+    this.appendCase("basic functionality", function (this: TestCase) {
+        this.check(UString.reverse("a123bc0") === "0cb321a");
+    });
+});
 mt.appendUnit("camel2snake", function (this: TestUnit) {
     this.appendCase("basic functionality", function (this: TestCase) {
         this.check(UString.camel2snake("abCdEf!") === "ab_cd_ef!");
