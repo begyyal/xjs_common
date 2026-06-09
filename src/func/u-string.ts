@@ -14,6 +14,9 @@ export namespace UString {
     export function repeat(token: string, mlt: number): string {
         return int2array(mlt).map(_ => token).join("");
     }
+    export function reverse(s: string): string {
+        return s.split("").reverse().join("");
+    }
     /**
      * generate date time number as fixed length (depends on `unit`) string without separator character.  
      * For example, `2025-06-08T10:15:06.366Z` is to be `20250608101506366`.
@@ -56,14 +59,14 @@ export namespace UString {
     }
     function asAmount(amount: number, unit: string): string {
         const int2dec = Math.abs(amount).toString().split(".");
-        const etni = int2dec[0].split("").reverse().join("");
+        const etni = reverse(int2dec[0]);
         let fetni = "";
         const max = Math.ceil(etni.length / 3);
         for (let i = 0; i < max; i++) {
             if (i === max - 1) fetni += etni.substring(i * 3);
             else fetni += (etni.substring(i * 3, (i + 1) * 3) + ",");
         }
-        const finte = unit + fetni.split("").reverse().join("");
+        const finte = unit + reverse(fetni);
         return (amount < 0 ? "-" : "") + (int2dec.length === 1 ? finte : finte + "." + int2dec[1]);
     }
     export function asJpy(amount: number): string {

@@ -1,7 +1,7 @@
 [![npm][npm-badge]][npm-url] [![CI][ci-badge]][ci-url] [![publish][publish-badge]][publish-url]
 
 # Overview
-Library modules for typescript that bundled general-purpose implementations.  
+Library modules for typescript that bundle general-purpose implementations.  
 This module is very simple, therefore it has no dependencies.
 
 # Install
