@@ -3,7 +3,7 @@ import { UType } from "./u-type";
 
 export namespace Array2 {
     /**
-     * generate `Map` object from an array.
+     * generates `Map` object from an array.
      * @param array source array.
      * @param keyGen predicate which generates map keys from a value of the array.
      * @param op.accumulate flag whether values of the map are accumulated or not if key/value from the array conflict. default is true. 
@@ -22,7 +22,7 @@ export namespace Array2 {
         return map;
     }
     /**
-     * generate a record object from an array and mapping functions.
+     * generates a record object from an array and mapping functions.
      * @param array entries to be mapped in the object. if only one generator option is specified, this is treated as keys or values.
      * @param op.kgen key generator. if you pass only this, `array` is treated as values.
      * @param op.vgen value generator. if you pass only this, `array` is treated as keys.
@@ -36,9 +36,7 @@ export namespace Array2 {
             o[k] = v; return o;
         }, {} as Record<K, V>);
     }
-    /** 
-     * sum up numbers in the array. if the array is empty, this returns `0`. 
-     */
+    /** sums up numbers in the array. if the array is empty, this returns `0`. */
     export function sum(array: (number | `${number}`)[]): number {
         return array.map(e => UType.isNumber(e) ? e : Number(e)).reduce((a, b) => a + b, 0);
     }

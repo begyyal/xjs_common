@@ -47,12 +47,12 @@ export namespace DType {
             td.t = t;
         });
     }
-    /** express required property. */
+    /** expresses a required property. */
     export function required(target: Object, propKey: string): void {
         setDesc(target, propKey, (td) => td.req = true);
     }
     /**
-     * express array.
+     * expresses an array.
      * @param elmDesc {@link TypeDesc} or {@link Ctor|class constructor type}.
      */
     export function array(elmDesc: AnyTypeDesc | Ctor = {}): (target: Object, propKey: string) => void {
@@ -60,7 +60,7 @@ export namespace DType {
             (td) => UType.isFunction(elmDesc) ? td.ary = { cls: elmDesc } : td.ary = elmDesc);
     }
     /**
-     * express record object. note that this may allow array type because array is essentialy object type has properties. 
+     * expresses a record object. note that this may allow array type because array is essentialy object type has properties. 
      * @param elmDesc {@link TypeDesc} or {@link Ctor|class constructor type}.
      */
     export function record(elmDesc: AnyTypeDesc | Ctor = {}): (target: Object, propKey: string) => void {
@@ -68,7 +68,7 @@ export namespace DType {
             (td) => UType.isFunction(elmDesc) ? td.rcd = { cls: elmDesc } : td.rcd = elmDesc);
     }
     /**
-     * express an object which has properties that specified class express with {@link DType}. 
+     * expresses an object which has properties that specified class express with {@link DType}. 
      * @param ctor {@link Ctor|class constructor type}.
      */
     export function object(ctor: Ctor): (target: Object, propKey: string) => void {
@@ -91,9 +91,7 @@ export namespace DType {
         }
         Object.defineProperty(target, smbl_tm, { value: map, configurable: true });
     }
-    /**
-     * returns decorated property keys with {@link DType}.
-     */
+    /** returns decorated property keys with {@link DType}. */
     export function keys(ctor: Ctor): string[] {
         const tm = new ctor()[smbl_tm];
         return tm ? Object.keys(tm) : [];

@@ -4,7 +4,7 @@ import { UType } from "./u-type";
 
 export namespace UObj {
     /**
-     * assign properties to the object with specified property keys.
+     * assigns properties to the object with specified property keys.
      * @param t target object.
      * @param s source object.
      * @param keys property keys which are copied from source object. if omit this, all keys in source object is applied.
@@ -19,7 +19,7 @@ export namespace UObj {
         return t;
     }
     /**
-     * crop properties of the object other than specified. the properties are to be removed with `delete` operator.
+     * crops properties of the object other than specified. the properties are to be removed with `delete` operator.
      * @param o object whose properties to be removed.
      * @param keys property names to be remained.
      * @param op.removeKeys if true, it removes `keys` instead of remaining it.
@@ -28,7 +28,7 @@ export namespace UObj {
     export function crop<T extends NormalRecord>(o: T, keys: IndexSignature[], op: { removeKeys: true, recursive: true }): Partial<T>;
     export function crop<T extends NormalRecord>(o: T, keys: (keyof T)[], op?: { removeKeys?: boolean, recursive?: boolean }): Partial<T>;
     /**
-     * crop properties that is not decorated with {@link DType}. the properties will be removed with `delete` operator. 
+     * crops properties that is not decorated with {@link DType}. the properties will be removed with `delete` operator. 
      * this treats constructual decorator such as {@link DType.object} recursively.
      * @param o object whose properties to be removed. if this is class object decorated with {@link DType}, it can omits `ctor` parameter.
      * @param ctor class constructor type whose properties are decorated with {@link DType}. **NOTE** that need to have public constructor without any parameter.
@@ -55,7 +55,7 @@ export namespace UObj {
         return o;
     }
     /**
-     * delete empty (`null` or `undefined`) properties excluding propeties decorated with {@link DType.required}.
+     * deletes empty (`null` or `undefined`) properties excluding propeties decorated with {@link DType.required}.
      * @param o an object to be truncated.
      * @param ctor this is referenced as a decorated schema instead of the object itself.
      */
@@ -65,7 +65,7 @@ export namespace UObj {
         return o;
     }
     /**
-     * manipulate properties of an object. 
+     * manipulates properties of an object. 
      * as default if the properties contains object, it also manipulates properties of that recursively.
      * @param o object whose properties the process applies to.
      * @param process process to be applied to properties of the object. note that function property is not included in the properties.

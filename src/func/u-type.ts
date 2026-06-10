@@ -27,7 +27,7 @@ export namespace UType {
         return Array.isArray(v) && (!t || v.every(e => typeof e === t));
     }
     /** 
-     * validate properties decorated with {@link DType}.
+     * validates properties decorated with {@link DType}.
      * @param o object to be validated. if this is class object decorated with {@link DType}, it can omits `ctor` parameter.
      * @param ctor class constructor type whose properties are decorated. **NOTE** that need to have public constructor without any parameter.
      * @returns invalid property keys. returns an empty array if `o` is valid.

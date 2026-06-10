@@ -66,7 +66,7 @@ export namespace UArray {
         return result;
     }
     /**
-     * chop an array to partial arrays which have specified length. the remainder is added to end of a result.  
+     * chops an array to partial arrays which have specified length. the remainder is added to end of a result.  
      * this function has compatibility to {@link AlmostArray} like {@link Uint8Array} etc.
      */
     export function chop<E>(array: E[], len: number): E[][];
@@ -84,7 +84,7 @@ export namespace UArray {
         if (idx !== -1) array.splice(idx, 1);
     }
     /**
-     * pick up an element (or elements) randomly from an array.
+     * picks up an element (or elements) randomly from an array.
      * @param array an array to be processed.
      * @param op.takeout remove the element picked up from the array. default is true.
      * @param op.count number of the elements picked up.

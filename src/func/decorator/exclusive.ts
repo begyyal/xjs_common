@@ -5,7 +5,7 @@ import { toMsec, waitFor } from "../u";
 const s_errCode = 100;
 
 /**
- * make the method exclusive in the process. **note that the method must return a `Promise`**.
+ * makes the method exclusive in the process. **note that the method must return a `Promise`**.
  * @param op.timeoutSec default is `30`.
  * @param op.semaphore count of process to be allowed to execute the method concurrently. default is `1`.
  */
