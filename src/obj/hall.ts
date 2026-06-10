@@ -11,10 +11,13 @@ const s_errCode = 300;
  * imagine someone speaks to audiences in the "Hall".
  */
 export class Hall<T> {
-    private readonly _listener: { cb: (d: T) => MaybePromise<any>, queues: [number, T][] }[] = [];
+    private readonly _listener: { id: number, cb: (d: T) => MaybePromise<any>, queues: [number, T][] }[] = [];
     private readonly _cleaners: (() => MaybePromise<any>)[] = [];
     private readonly _takingNotesMsec: number;
-    private _qidGen = 1;
+    private _qidTop = 0;
+    private _lidTop = 0;
+    /** what {@link speak()|spoke} last. */
+    currentStatement: T = null;
     /**
      * @param op.takingNotesMsec queue processing timeout milliseconds. (what speak is processed sequentially each audience.) default is 30 seconds.
      */
@@ -22,13 +25,14 @@ export class Hall<T> {
         this._takingNotesMsec = op?.takingNotesMsec ?? toMsec(30, TimeUnit.Sec);
     }
     /**
-     * speak something to audiences.
+     * speaks something to audiences.
      * @param d contents of speak.
      * @returns promise that resolves when all audiences digest what speak so far.
      */
     async speak(d: T): Promise<void> {
+        this.currentStatement = d;
+        const qid = ++this._qidTop;
         if (this._listener.length === 0) return;
-        const qid = this._qidGen++;
         await Promise.all(this._listener.map(async r => {
             r.queues.push([qid, d]);
             await waitFor(() => {
@@ -45,14 +49,32 @@ export class Hall<T> {
         }));
     }
     /**
-     * attend for hearing speak.
+     * attends for hearing speak.
      * @param cb callback to digest what speak.
+     * @returns a tuple contains seat number and a promise object which resolves after processing precedent statement. 
+     * it can takes seat number for {@link leave()} to remove the callback.
      */
-    attend(cb: (d: T) => MaybePromise<any>): void {
-        this._listener.push({ cb, queues: [] });
+    attend(cb: (d: T) => MaybePromise<any>): { seatNum: number, keepUpPrms: Promise<void> } {
+        const queues = [], d = this.currentStatement;
+        this._listener.push({ id: ++this._lidTop, cb, queues });
+        let keepUpPrms: Promise<void> = null;
+        if (this._qidTop > 0) {
+            queues.push([this._qidTop, d]);
+            keepUpPrms = (async () => {
+                try { await cb(d); } finally { queues.shift(); }
+            })();
+        } else keepUpPrms = Promise.resolve();
+        return { seatNum: this._lidTop, keepUpPrms };
     }
     /**
-     * break up audiences with cleaning.
+     * leaves seat for removing the callback.
+     * @param seatNum audience id returned from {@link attend()}.
+     */
+    leave(seatNum: number): void {
+        UArray.takeOut(this._listener, l => l.id === seatNum);
+    }
+    /**
+     * breaks up audiences with cleaning.
      * @returns promise that resolves when all audiences digest what speak so far and complete cleaning.
      */
     async breakUp(): Promise<void> {
@@ -66,14 +88,14 @@ export class Hall<T> {
         });
     }
     /**
-     * assign a cleaner who cleans the hall just after breaking up.
+     * assigns a cleaner who cleans the hall just after breaking up.
      * @param cb callback to clean the hall.
      */
     assignCleaner(cb: () => MaybePromise<any>): void {
         this._cleaners.push(cb);
     }
     /**
-     * await attendance of audiences.
+     * awaits attendance of audiences.
      * @param op.count number of audiences to attend. default is 1.
      * @param op.timeoutMsec timeout milliseconds. default is 30 seconds, or `takingNotesMsec` if exists.
      */
@@ -85,7 +107,7 @@ export class Hall<T> {
         });
     }
     /**
-     * await when the hall breaks up.
+     * awaits when the hall breaks up.
      * @param op.timeoutMsec timeout milliseconds. default is an hour.
      */
     async awaitBreakingUp(op?: { timeoutMsec?: number }): Promise<void> {

@@ -1,6 +1,7 @@
 import { ModuleTest, TestCase, TestUnit } from "xjs-test";
 import { Hall } from "../../obj/hall";
 import { delay, int2array } from "../../func/u";
+import { UArray } from "../../func/u-array";
 
 const mt = new ModuleTest("T_Hall");
 mt.appendUnit("hall", function (this: TestUnit) {
@@ -62,6 +63,25 @@ mt.appendUnit("hall", function (this: TestUnit) {
         hall.breakUp();
         await hall.awaitBreakingUp();
         this.check(rcv);
+    });
+    this.appendCase("process precedent statement.", async function (this: TestCase) {
+        const hall = new Hall<number>();
+        let rcv = [];
+        hall.speak(1);
+        hall.attend(n => delay(1).then(() => rcv.push(n)));
+        await hall.speak(2);
+        this.check(UArray.eq(rcv, [1, 2], { sort: false }));
+    });
+    this.appendCase("leave seat.", async function (this: TestCase) {
+        const hall = new Hall<number>();
+        let rcv = [];
+        const tpl = hall.attend(() => rcv.push(1));
+        hall.attend(() => rcv.push(2));
+        hall.leave(tpl.seatNum);
+        await hall.speak(1);
+        this.check(UArray.eq(rcv, [2], { sort: false }));
+        this.expectError();
+        await hall.awaitAudience({ count: 2, timeoutMsec: 1_000 });
     });
 }, { concurrent: true });
 export const T_Hall = mt;
