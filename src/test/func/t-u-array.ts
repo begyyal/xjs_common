@@ -192,5 +192,12 @@ mt.appendUnit("parallelForEach", function (this: TestUnit) {
         }, 2);
         this.check(UArray.eq(ary, [1, 2, 1, 3, 2, 3], { sort: false }), () => `actual => ${ary}`);
     });
+    this.appendCase("pass queue index to callback.", async function (this: TestCase) {
+        const ary = [];
+        await UArray.parallelForEach([3, 2, 1], async (_, i) => {
+            await delay(0.1).then(() => ary.push(i));
+        });
+        this.check(UArray.eq(ary, [0, 1, 2]), () => `actual => ${ary}`);
+    });
 });
 export const T_UArray = mt;
