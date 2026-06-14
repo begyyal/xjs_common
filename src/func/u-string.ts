@@ -28,12 +28,49 @@ export namespace UString {
         if (op?.unit === TimeUnit.Msec) return t;
         return t.substring(0, 14 - (6 - (op?.unit ?? TimeUnit.Sec)) * 2);
     }
-    export function generateRandomString(len: number): string {
+    /**
+     * generates random string with specified length.
+     * @param len string length to be generated.
+     * @param includes.num whether numbers are included or not. default is true.
+     * @param includes.alphabet whether alphbets are included or not. default is true.
+     * @param includes.specials special characters excluding number and alphabet. default is none.
+     */
+    export function genRandomStr(
+        len: number, includes?: { num?: boolean, alphabet?: boolean, specials?: string }): string;
+    /**
+     * generates random string with specified length.
+     * @param len string length to be generated.
+     * @param includes.num whether numbers are included or not. default is true.
+     * @param includes.alphabet.upper whether upper case alphabets are included or not. default is true. 
+     * @param includes.alphabet.lower whether lower case alphabets are included or not. default is true. 
+     * @param includes.specials special characters excluding number and alphabet. default is none.
+     */
+    export function genRandomStr(
+        len: number, includes: { num?: boolean, alphabet?: { upper?: boolean, lower?: boolean }, specials?: string }): string;
+    export function genRandomStr(
+        len: number,
+        includes?: { num?: boolean, alphabet?: boolean | { upper?: boolean, lower?: boolean }, specials?: string }): string {
+        const _includes = {
+            num: includes?.num ?? true,
+            alphabet: {
+                upper: (UType.isBoolean(includes?.alphabet) ? includes.alphabet : includes?.alphabet?.upper) ?? true,
+                lower: (UType.isBoolean(includes?.alphabet) ? includes.alphabet : includes?.alphabet?.lower) ?? true
+            },
+            specials: includes?.specials ?? ""
+        };
+        const _alphabetShift = _includes.alphabet.upper || _includes.alphabet.lower ? 52 : 0;
+        const _normalLen = (_includes.num ? 12 : 0) + _alphabetShift;
+        if (_normalLen + _includes.specials.length === 0)
+            throw new XjsErr(s_errCode, "no characters to include were set.");
         return int2array(len).map(_ => {
-            let rnd = Math.floor(62 * Math.random());
-            const remain = rnd - 52;
+            let rnd = Math.floor((_normalLen + _includes.specials.length) * Math.random());
+            if (rnd - _normalLen >= 0) return _includes.specials.at(rnd - _normalLen);
+            const remain = rnd - _alphabetShift;
             if (remain >= 0) return remain.toString();
-            if (rnd > 25) rnd += 6;
+            if (rnd > 25) {
+                if (_includes.alphabet.lower) rnd += 6;
+                else rnd -= 26;
+            } else if (!_includes.alphabet.upper) rnd += 32;
             return String.fromCharCode(rnd + 65);
         }).join("");
     }

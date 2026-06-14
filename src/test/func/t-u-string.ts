@@ -150,9 +150,24 @@ mt.appendUnit("snake2camel", function (this: TestUnit) {
         this.check(UString.snake2camel("ab_cd_ef_!") === "abCdEf!");
     });
 });
-mt.appendUnit("generateRandomString", function (this: TestUnit) {
+mt.appendUnit("genRandomStr", function (this: TestUnit) {
     this.appendCase("includes alphabet and number only.", function (this: TestCase) {
-        this.check(int2array(100).every(_ => !!UString.generateRandomString(100).match(/^[a-zA-Z0-9]+$/)));
+        this.check(int2array(100).every(_ => !!UString.genRandomStr(100).match(/^[a-zA-Z0-9]+$/)));
+    });
+    this.appendCase("excludes alphabet.", function (this: TestCase) {
+        this.check(int2array(100).every(_ => !!UString.genRandomStr(100, { alphabet: false }).match(/^[0-9]+$/)));
+    });
+    this.appendCase("excludes upper case alphabet.", function (this: TestCase) {
+        this.check(int2array(100).every(_ => !!UString.genRandomStr(100, { alphabet: { upper: false } }).match(/^[a-z0-9]+$/)));
+    });
+    this.appendCase("excludes lower case alphabet.", function (this: TestCase) {
+        this.check(int2array(100).every(_ => !!UString.genRandomStr(100, { alphabet: { lower: false } }).match(/^[A-Z0-9]+$/)));
+    });
+    this.appendCase("excludes number.", function (this: TestCase) {
+        this.check(int2array(100).every(_ => !!UString.genRandomStr(100, { num: false }).match(/^[a-zA-Z]+$/)));
+    });
+    this.appendCase("includes special characters.", function (this: TestCase) {
+        this.check(int2array(3).some(_ => !!UString.genRandomStr(100, { specials: "-_.!?" }).match(/[\.\-_\!\?]/)));
     });
 });
 export const T_UString = mt;

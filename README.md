@@ -99,7 +99,7 @@ import { UString } from "xjs-common";
     console.log(UString.eq("Tanaka Taro", "tanaka taro", { ignoreCace: true }));
 
     // e.g. cfNouG0P
-    console.log(UString.generateRandomString(8));
+    console.log(UString.genRandomStr(8));
 
     // conversion between alphabet and numeric index.
     console.log(UString.az2idx("AA"));
