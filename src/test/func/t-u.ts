@@ -112,5 +112,11 @@ mt.appendUnit("waitFor", function (this: TestUnit) {
         this.expectError();
         await waitFor(() => a > 0, { timeoutMsec: 100 });
     });
-}, { concurrent: true });
+    this.appendCase("set interval msec.", async function (this: TestCase) {
+        let a = 0, b = 0;
+        delay(1).then(() => a++);
+        await waitFor(() => b++ && a > 0, { intervalMsec: 600 });
+        this.check(b === 2);
+    });
+});
 export const T_U = mt;

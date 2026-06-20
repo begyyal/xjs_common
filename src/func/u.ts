@@ -92,8 +92,16 @@ export function toMsec(value: number, unit: TimeUnit.Sec | TimeUnit.Min | TimeUn
     if (unit <= TimeUnit.Day) v *= 24;
     return v;
 }
-export function waitFor(predicete: () => boolean, op?: { timeoutMsec?: number, thrownIfTimeout?: () => any }): Promise<void> {
+/**
+ * waits for that a callback returns true.
+ * @param predicate callback to return true when completes.
+ * @param op.timeoutMsec timeout milliseconds. default is 30 seconds.
+ * @param op.thrownIfTimeout callback to generate something to be thrown when rejected.
+ * @param op.intervalMsec interval milliseconds of calling {@link predicate}. default is 100.
+ */
+export function waitFor(predicate: () => boolean, op?: { timeoutMsec?: number, thrownIfTimeout?: () => any, intervalMsec?: number, }): Promise<void> {
     const _timeout = op?.timeoutMsec ?? 30_000;
+    const _interval = op?.intervalMsec ?? 100;
     return new Promise((rs, rj) => {
         let toRj = null, toRs = null;
         const clear = () => { clearInterval(toRs); clearTimeout(toRj); }
@@ -103,8 +111,8 @@ export function waitFor(predicete: () => boolean, op?: { timeoutMsec?: number, t
         }, _timeout);
         toRs = setInterval(() => {
             try {
-                if (predicete()) { clear(); rs(); }
+                if (predicate()) { clear(); rs(); }
             } catch (e) { clear(); rj(e); }
-        }, 100);
+        }, _interval);
     });
 }

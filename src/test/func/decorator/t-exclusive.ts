@@ -31,7 +31,7 @@ mt.appendUnit("exclusive", function (this: TestUnit<{ cls: Cls }>) {
     });
     this.appendCase("semaphore works correctly.", async function (this: TestCase, c) {
         c.cls.exe_smp2(2, 1);
-        c.cls.exe_smp2(0.5, 2);
+        c.cls.exe_smp2(0.2, 2);
         await c.cls.exe_smp2(0, 3);
         this.check(UArray.eq(c.cls.array, [2, 3], { sort: false }), () => c.cls.array);
     });
@@ -40,5 +40,5 @@ mt.appendUnit("exclusive", function (this: TestUnit<{ cls: Cls }>) {
         c.cls.exe_to1(1, 1);
         await c.cls.exe_to1(0, 2);
     });
-}, { concurrent: true });
+});
 export const T_Exclusive = mt;
