@@ -29,7 +29,7 @@ mt.appendUnit("retry", function (this: TestUnit<{
     }));
     this.appendCase("result value from callback is returned correctly.", function (this: TestCase, c) {
         this.check(retry(c.cb, { count: 2, logger: s_emptyLogger }) === 1);
-    });
+    }, { concurrent: true });
     this.chainContextGen(c => ({
         cb: () => {
             c.counter += 1;
@@ -40,11 +40,11 @@ mt.appendUnit("retry", function (this: TestUnit<{
     this.appendCase("callback is retried by default retryable count correctly.", function (this: TestCase, c) {
         this.expectError(e => e === 2);
         retry(c.cb, { logger: s_emptyLogger });
-    });
+    }, { concurrent: true });
     this.appendCase("specified retry count is working.", function (this: TestCase, c) {
         const ret = retry(c.cb, { count: 2, logger: s_emptyLogger });
         this.check(ret === 3);
-    });
+    }, { concurrent: true });
     this.chainContextGen(c => ({
         cbAsync: async () => {
             c.array.push(c.counter);
@@ -56,11 +56,11 @@ mt.appendUnit("retry", function (this: TestUnit<{
     this.appendCase("async callback is working.", async function (this: TestCase, c) {
         const ret = await retry(c.cbAsync, { count: 2, logger: s_emptyLogger });
         this.check(ret === 3);
-    });
+    }, { concurrent: true });
     this.appendCase("error criterion is working.", async function (this: TestCase, c) {
         try { await retry(c.cbAsync, { errorCriterion: e => e != 1, logger: s_emptyLogger }); } catch { /** pass here is correct. */ }
         this.check(c.counter === 1);
-    });
+    }, { concurrent: true });
     this.appendCase("interval predicate is working.", async function (this: TestCase, c) {
         try {
             await retry(c.cbAsync, {
@@ -69,7 +69,7 @@ mt.appendUnit("retry", function (this: TestUnit<{
             });
         } catch { }
         this.check(UArray.eq(c.array, [0, -1, 1, -1, 2], { sort: false }));
-    });
+    }, { concurrent: true });
     this.chainContextGen(() => ({
         cb: () => { throw 1; },
         array: [Date.now()]
@@ -84,7 +84,7 @@ mt.appendUnit("retry", function (this: TestUnit<{
         } catch { }
         this.check(c.array[1] - c.array[0] < 600, () => c.array[1] - c.array[0]);
         this.check(c.array[2] - c.array[1] >= 600, () => c.array[2] - c.array[1]);
-    });
+    }, { concurrent: true });
 }, { concurrent: true });
 mt.appendUnit("toMsec", function (this: TestUnit) {
     this.appendCase("convert seconds.", function (this: TestCase) {
@@ -118,5 +118,5 @@ mt.appendUnit("waitFor", function (this: TestUnit) {
         await waitFor(() => b++ && a > 0, { intervalMsec: 600 });
         this.check(b === 2);
     });
-});
+}, { concurrent: true });
 export const T_U = mt;

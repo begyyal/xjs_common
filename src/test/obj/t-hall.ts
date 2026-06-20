@@ -20,7 +20,7 @@ mt.appendUnit("hall", function (this: TestUnit) {
         trcv.speak(1);
         await trcv.breakUp();
         this.check(result1 === "3,2,1" && result2 === "3,2,1", () => result1);
-    });
+    }, { concurrent: true });
     this.appendCase("regist async callbacks.", async function (this: TestCase) {
         const hall = new Hall<number>();
         const array1: number[] = [], array2: number[] = [];
@@ -36,7 +36,7 @@ mt.appendUnit("hall", function (this: TestUnit) {
         hall.speak(1);
         await hall.breakUp();
         this.check(result1 === "3,2,1" && result2 === "3,2,1");
-    });
+    }, { concurrent: true });
     this.appendCase("send many data async and timeout occur.", async function (this: TestCase) {
         const hall = new Hall<number>({ takingNotesMsec: 3_000 });
         hall.attend(_ => delay(0.1));
@@ -54,7 +54,7 @@ mt.appendUnit("hall", function (this: TestUnit) {
         });
         await hall.awaitAudience();
         this.check(attended);
-    });
+    }, { concurrent: true });
     this.appendCase("await breaking up.", async function (this: TestCase) {
         const hall = new Hall<number>();
         let rcv = false;
@@ -63,7 +63,7 @@ mt.appendUnit("hall", function (this: TestUnit) {
         hall.breakUp();
         await hall.awaitBreakingUp();
         this.check(rcv);
-    });
+    }, { concurrent: true });
     this.appendCase("process precedent statement.", async function (this: TestCase) {
         const hall = new Hall<number>();
         let rcv = [];
@@ -71,7 +71,7 @@ mt.appendUnit("hall", function (this: TestUnit) {
         hall.attend(n => delay(1).then(() => rcv.push(n)));
         await hall.speak(2);
         this.check(UArray.eq(rcv, [1, 2], { sort: false }));
-    });
+    }, { concurrent: true });
     this.appendCase("leave seat.", async function (this: TestCase) {
         const hall = new Hall<number>();
         let rcv = [];
@@ -82,6 +82,6 @@ mt.appendUnit("hall", function (this: TestUnit) {
         this.check(UArray.eq(rcv, [2], { sort: false }));
         this.expectError();
         await hall.awaitAudience({ count: 2, timeoutMsec: 1_000 });
-    });
-}, { concurrent: true });
+    }), { concurrent: true };
+});
 export const T_Hall = mt;
