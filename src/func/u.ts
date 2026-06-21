@@ -96,23 +96,21 @@ export function toMsec(value: number, unit: TimeUnit.Sec | TimeUnit.Min | TimeUn
  * waits for that a callback returns true.
  * @param predicate callback to return true when completes.
  * @param op.timeoutMsec timeout milliseconds. default is 30 seconds.
- * @param op.thrownIfTimeout callback to generate something to be thrown when rejected.
  * @param op.intervalMsec interval milliseconds of calling {@link predicate}. default is 100.
  */
-export function waitFor(predicate: () => boolean, op?: { timeoutMsec?: number, thrownIfTimeout?: () => any, intervalMsec?: number, }): Promise<void> {
+export function waitFor(predicate: () => MaybePromise<boolean>, op?: { timeoutMsec?: number, intervalMsec?: number, }): Promise<void> {
     const _timeout = op?.timeoutMsec ?? 30_000;
     const _interval = op?.intervalMsec ?? 100;
-    return new Promise((rs, rj) => {
-        let toRj = null, toRs = null;
-        const clear = () => { clearInterval(toRs); clearTimeout(toRj); }
-        toRj = setTimeout(() => {
-            clear();
-            rj(op?.thrownIfTimeout ? op.thrownIfTimeout() : new XjsErr(s_errCode, "time is over in waitFor()."));
-        }, _timeout);
-        toRs = setInterval(() => {
+    const reservedError = new XjsErr(s_errCode, "time is over in waitFor()."); // for displaying callstack...
+    return new Promise(async (rs, rj) => {
+        const limit = Date.now() + _timeout;
+        do {
             try {
-                if (predicate()) { clear(); rs(); }
-            } catch (e) { clear(); rj(e); }
-        }, _interval);
+                if (await predicate()) return rs();
+            } catch (e) { rj(e); }
+            if (limit > _interval + Date.now()) await delay(_interval / 1000);
+            else rj(reservedError);
+        } while (limit > Date.now());
+        rj(reservedError);
     });
 }

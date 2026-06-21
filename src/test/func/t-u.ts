@@ -116,7 +116,12 @@ mt.appendUnit("waitFor", function (this: TestUnit) {
         let a = 0, b = 0;
         delay(1).then(() => a++);
         await waitFor(() => b++ && a > 0, { intervalMsec: 600 });
-        this.check(b === 2);
+        this.check(b === 3);
+    });
+    this.appendCase("pass async callback.", async function (this: TestCase) {
+        let a = 0;
+        await waitFor(async () => delay(1.5).then(() => a++ > 2), { timeoutMsec: 2_000, intervalMsec: 1_000 }).catch(() => { });
+        this.check(a === 1, () => a);
     });
 }, { concurrent: true });
 export const T_U = mt;
