@@ -1,10 +1,9 @@
 import { AlmostArray } from "../const/types";
+import { XjsErrCode } from "../const/xjs-err-code";
 import { XjsErr } from "../obj/xjs-err";
 import { Array2 } from "./array2";
 import { int2array } from "./u";
 import { UType } from "./u-type";
-
-const s_errCode = 40;
 
 export namespace UArray {
     /** 
@@ -94,10 +93,10 @@ export namespace UArray {
     export function randomPick<T>(array: T[], op: { takeout?: boolean, count: 1 }): T;
     export function randomPick<T>(array: T[], op: { takeout?: boolean, allowDup?: boolean, count: number }): T[]
     export function randomPick<T>(arg_array: T[], op?: { takeout?: boolean, allowDup?: boolean, count?: number }): T | T[] {
-        if (arg_array.length === 0) throw new XjsErr(s_errCode, "it couldn't pick up an element from emtpy array.");
+        if (arg_array.length === 0) throw new XjsErr(XjsErrCode.UArray, "it couldn't pick up an element from emtpy array.");
         const takeout = op?.takeout ?? true, count = op?.count ?? 1, allowDup = op?.allowDup ?? false;
         if (!allowDup && count > arg_array.length)
-            throw new XjsErr(s_errCode, "despite allowDup is false, length of the array is less than count.");
+            throw new XjsErr(XjsErrCode.UArray, "despite allowDup is false, length of the array is less than count.");
         const array = takeout ? arg_array : [...arg_array];
         if (count === 1) return array.splice(Math.floor(array.length * Math.random()), 1)[0];
         let indexes = int2array(count)

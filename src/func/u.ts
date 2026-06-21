@@ -1,15 +1,14 @@
 import { TimeUnit } from "../const/time-unit";
 import { Loggable, MaybePromise } from "../const/types";
+import { XjsErrCode } from "../const/xjs-err-code";
 import { XjsErr } from "../obj/xjs-err";
-
-const s_errCode = 10;
 
 export function delay(sec: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, 1000 * sec));
 }
 export function int2array(size: number): number[] {
     const s = Number(size);
-    if (Number.isNaN(s)) throw new XjsErr(s_errCode, "size of the argument is not number.");
+    if (Number.isNaN(s)) throw new XjsErr(XjsErrCode.U, "size of the argument is not number.");
     return Array.from(Array(s).keys());
 }
 export interface RetryOption<T = MaybePromise> {
@@ -57,7 +56,7 @@ export function retry<T>(cb: () => MaybePromise<T>, op?: SyncRetryOption | Async
     const prcs = (c: number, e?: any) => {
         if (c < 0) {
             l.error("[XJS] failure exceeds retryable count.");
-            throw e ?? new XjsErr(s_errCode, "failure exceeds retryable count.", e);
+            throw e ?? new XjsErr(XjsErrCode.U, "failure exceeds retryable count.", e);
         }
         if (e) {
             l.warn(`[XJS] it does retry of ${initialCount - c}th time to the call back.`);
@@ -101,7 +100,7 @@ export function toMsec(value: number, unit: TimeUnit.Sec | TimeUnit.Min | TimeUn
 export function waitFor(predicate: () => MaybePromise<boolean>, op?: { timeoutMsec?: number, intervalMsec?: number, }): Promise<void> {
     const _timeout = op?.timeoutMsec ?? 30_000;
     const _interval = op?.intervalMsec ?? 100;
-    const reservedError = new XjsErr(s_errCode, "time is over in waitFor()."); // for displaying callstack...
+    const reservedError = new XjsErr(XjsErrCode.U, "time is over in waitFor()."); // for displaying callstack...
     return new Promise(async (rs, rj) => {
         const limit = Date.now() + _timeout;
         do {

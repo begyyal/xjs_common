@@ -1,9 +1,8 @@
 import { TimeUnit } from "../const/time-unit";
+import { XjsErrCode } from "../const/xjs-err-code";
 import { XjsErr } from "../obj/xjs-err";
 import { int2array } from "./u";
 import { UType } from "./u-type";
-
-const s_errCode = 20;
 
 export namespace UString {
     export function eq(s1: string, s2: string, op?: { ignoreCace?: boolean }): boolean {
@@ -61,7 +60,7 @@ export namespace UString {
         const _alphabetShift = _includes.alphabet.upper || _includes.alphabet.lower ? 52 : 0;
         const _normalLen = (_includes.num ? 12 : 0) + _alphabetShift;
         if (_normalLen + _includes.specials.length === 0)
-            throw new XjsErr(s_errCode, "no characters to include were set.");
+            throw new XjsErr(XjsErrCode.UString, "no characters to include were set.");
         return int2array(len).map(_ => {
             let rnd = Math.floor((_normalLen + _includes.specials.length) * Math.random());
             if (rnd - _normalLen >= 0) return _includes.specials.at(rnd - _normalLen);
@@ -84,7 +83,7 @@ export namespace UString {
     }
     export function az2idx(az: string): number {
         if (!az?.match(/^[a-zA-Z]+$/))
-            throw new XjsErr(s_errCode, "the parameter isn't az(AZ) format.");
+            throw new XjsErr(XjsErrCode.UString, "the parameter isn't az(AZ) format.");
         return az.toLowerCase().split("").map(c => c.charCodeAt(0) - 97).reverse()
             .map((idx, i) => (idx + 1) * (26 ** i)).reduce((v1, v2) => v1 + v2) - 1;
     }

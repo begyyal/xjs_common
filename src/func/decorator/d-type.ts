@@ -2,8 +2,7 @@ import { Ctor, Type } from "../../const/types";
 import { XjsErr } from "../../obj/xjs-err";
 import { UType } from "../u-type";
 import { UObj } from "../u-obj";
-
-const s_errCode = 30;
+import { XjsErrCode } from "../../const/xjs-err-code";
 
 export const smbl_tm = Symbol.for("xjs:typeMap");
 export interface TypeDesc {
@@ -43,7 +42,7 @@ export namespace DType {
     }
     function setTypeDesc(target: Object, propKey: string, t: Type): void {
         setDesc(target, propKey, (td) => {
-            if (td.t) throw new XjsErr(s_errCode, "decorator to express type is duplicate.");
+            if (td.t) throw new XjsErr(XjsErrCode.DType, "decorator to express type is duplicate.");
             td.t = t;
         });
     }
@@ -87,7 +86,7 @@ export namespace DType {
             let ex1 = null, ex2 = null;
             if (td.t) { ex1 = "type"; ex2 = structualDescs[0][1]; }
             if (structualDescs.length > 1) { ex1 = structualDescs[0][1]; ex2 = structualDescs[1][1]; }
-            if (ex1 && ex2) throw new XjsErr(s_errCode, `decorator to express ${ex1} and ${ex2} are exclusive.`);
+            if (ex1 && ex2) throw new XjsErr(XjsErrCode.DType, `decorator to express ${ex1} and ${ex2} are exclusive.`);
         }
         Object.defineProperty(target, smbl_tm, { value: map, configurable: true });
     }

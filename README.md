@@ -245,7 +245,8 @@ function dispatchAsyncTask(): Hall<number> {
 })();
 ```
 # Error definition
-XJS throws error with `code` property which has one of the following numbers.
+XJS throws an error with `code` property which has one of the following numbers.  
+these are described in [XjsErrCode](https://github.com/begyyal/xjs_common/tree/main/src/const/xjs-err-code.ts) enum.
 |code|thrown by|
 |:---|:---|
 |10|`func/u`|

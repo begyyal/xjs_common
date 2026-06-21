@@ -1,8 +1,7 @@
 import { TimeUnit } from "../../const/time-unit";
+import { XjsErrCode } from "../../const/xjs-err-code";
 import { XjsErr } from "../../obj/xjs-err";
 import { toMsec, waitFor } from "../u";
-
-const s_errCode = 100;
 
 /**
  * makes the method exclusive in the process. **note that the method must return a `Promise`**.
@@ -13,7 +12,7 @@ export function exclusive(op?: { timeoutSec?: number, semaphore?: number }) {
     let _smp = op?.semaphore ?? 1;
     const waitForOp = {
         timeoutMsec: toMsec(op?.timeoutSec ?? 30, TimeUnit.Sec),
-        thrownIfTimeout: () => new XjsErr(s_errCode, "An exclusive process to execute was already running by other request.")
+        thrownIfTimeout: () => new XjsErr(XjsErrCode.Exclusive, "An exclusive process to execute was already running by other request.")
     };
     return (_target: any, _propertyKey: string, descriptor: PropertyDescriptor) => {
         const method = descriptor.value!;

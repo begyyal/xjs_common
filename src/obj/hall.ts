@@ -1,10 +1,9 @@
 import { TimeUnit } from "../const/time-unit";
 import { MaybePromise } from "../const/types";
+import { XjsErrCode } from "../const/xjs-err-code";
 import { toMsec, waitFor } from "../func/u";
 import { UArray } from "../func/u-array";
 import { XjsErr } from "./xjs-err";
-
-const s_errCode = 300;
 
 /**
  * facilitates data transfer across asynchronous tasks.  
@@ -36,14 +35,13 @@ export class Hall<T> {
         await Promise.all(this._listener.map(async r => {
             r.queues.push([qid, d]);
             await waitFor(() => {
-                if (r.queues.length === 0) new XjsErr(s_errCode, "already broke up in this hall.");
+                if (r.queues.length === 0) new XjsErr(XjsErrCode.Hall, "already broke up in this hall.");
                 return r.queues[0][0] === qid;
-            }, {
-                timeoutMsec: this._takingNotesMsec,
-                thrownIfTimeout: () => {
+            }, { timeoutMsec: this._takingNotesMsec }).catch(e => {
+                if (e instanceof XjsErr && e.code === 10) {
                     UArray.takeOut(r.queues, q => q[0] === qid);
-                    return new XjsErr(s_errCode, "couldn't keep up with speakings.");
-                }
+                    return new XjsErr(XjsErrCode.Hall, "couldn't keep up with speakings.");
+                } else throw e;
             });
             try { await r.cb(d); } finally { r.queues.shift(); }
         }));
@@ -79,8 +77,10 @@ export class Hall<T> {
      */
     async breakUp(): Promise<void> {
         await Promise.all(this._listener.map(r => waitFor(() => r.queues.length === 0, {
-            timeoutMsec: this._takingNotesMsec,
-            thrownIfTimeout: () => new XjsErr(s_errCode, "xjs hall break up within speakings.")
+            timeoutMsec: this._takingNotesMsec
+        }).catch(e => {
+            if (e instanceof XjsErr && e.code === 10) throw new XjsErr(XjsErrCode.Hall, "xjs hall break up within speakings.");
+            else throw e;
         }))).finally(() => {
             this._listener.forEach(r => r.queues.splice(0));
             this._listener.splice(0);
@@ -101,9 +101,9 @@ export class Hall<T> {
      */
     async awaitAudience(op?: { count?: number, timeoutMsec?: number }): Promise<void> {
         const _count = op?.count ?? 1;
-        await waitFor(() => this._listener.length >= _count, {
-            timeoutMsec: op?.timeoutMsec ?? this._takingNotesMsec,
-            thrownIfTimeout: () => new XjsErr(s_errCode, "audience was not filled within the time.")
+        await waitFor(() => this._listener.length >= _count, { timeoutMsec: op?.timeoutMsec ?? this._takingNotesMsec }).catch(e => {
+            if (e instanceof XjsErr && e.code === XjsErrCode.U) throw new XjsErr(XjsErrCode.Hall, "audience was not filled within the time.");
+            else throw e;
         });
     }
     /**
@@ -113,9 +113,9 @@ export class Hall<T> {
     async awaitBreakingUp(op?: { timeoutMsec?: number }): Promise<void> {
         let released = false;
         this.assignCleaner(() => released = true);
-        await waitFor(() => released, {
-            timeoutMsec: op?.timeoutMsec ?? toMsec(1, TimeUnit.Hour),
-            thrownIfTimeout: () => new XjsErr(s_errCode, "xjs hall didn't break up within the time.")
+        await waitFor(() => released, { timeoutMsec: op?.timeoutMsec ?? toMsec(1, TimeUnit.Hour) }).catch(e => {
+            if (e instanceof XjsErr && e.code === XjsErrCode.U) throw new XjsErr(XjsErrCode.Hall, "xjs hall didn't break up within the time.");
+            else throw e;
         });
     }
 }
