@@ -18,6 +18,6 @@ export namespace UHttp {
     /** normalizes object keys to lower case. */
     export function normalizeHeaders(headers: Record<string, any>): Record<string, any> {
         if (!headers) return {};
-        return Object.entries(headers).reduce((a, b) => { a[b[0].toLowerCase()] = b[1]; return a; }, {});
+        return Object.entries(headers).reduce((a, b) => { a[b[0].toLowerCase()] = b[1]; return a; }, {} as Record<string, any>);
     }
 }

@@ -16,7 +16,7 @@ export class Hall<T> {
     private _qidTop = 0;
     private _lidTop = 0;
     /** what {@link speak()|spoke} last. */
-    currentStatement: T = null;
+    currentStatement?: T;
     /**
      * @param op.takingNotesMsec queue processing timeout milliseconds. (what speak is processed sequentially each audience.) default is 30 seconds.
      */
@@ -53,13 +53,13 @@ export class Hall<T> {
      * it can takes seat number for {@link leave()} to remove the callback.
      */
     attend(cb: (d: T) => MaybePromise<any>): { seatNum: number, keepUpPrms: Promise<void> } {
-        const queues = [], d = this.currentStatement;
+        const queues: [number, T][] = [], d = this.currentStatement;
         this._listener.push({ id: ++this._lidTop, cb, queues });
-        let keepUpPrms: Promise<void> = null;
+        let keepUpPrms: Promise<void>;
         if (this._qidTop > 0) {
-            queues.push([this._qidTop, d]);
+            queues.push([this._qidTop, d!]);
             keepUpPrms = (async () => {
-                try { await cb(d); } finally { queues.shift(); }
+                try { await cb(d!); } finally { queues.shift(); }
             })();
         } else keepUpPrms = Promise.resolve();
         return { seatNum: this._lidTop, keepUpPrms };

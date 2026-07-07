@@ -8,7 +8,7 @@ mt.appendUnit("hall", function (this: TestUnit) {
     this.appendCase("basic functionality", async function (this: TestCase) {
         const trcv = new Hall<number>();
         const array1: number[] = [], array2: number[] = [];
-        let result1 = null, result2 = null;
+        let result1: string, result2: string;
         trcv.attend(n => array1.push(n));
         trcv.attend(n => array2.push(n));
         trcv.assignCleaner(() => {
@@ -19,7 +19,7 @@ mt.appendUnit("hall", function (this: TestUnit) {
         trcv.speak(2);
         trcv.speak(1);
         await trcv.breakUp();
-        this.check(result1 === "3,2,1" && result2 === "3,2,1", () => result1);
+        this.check(result1! === "3,2,1" && result2! === "3,2,1", () => result1);
     }, { concurrent: true });
     this.appendCase("regist async callbacks.", async function (this: TestCase) {
         const hall = new Hall<number>();
@@ -66,7 +66,7 @@ mt.appendUnit("hall", function (this: TestUnit) {
     }, { concurrent: true });
     this.appendCase("process precedent statement.", async function (this: TestCase) {
         const hall = new Hall<number>();
-        let rcv = [];
+        let rcv: number[] = [];
         hall.speak(1);
         hall.attend(n => delay(1).then(() => rcv.push(n)));
         await hall.speak(2);
@@ -74,7 +74,7 @@ mt.appendUnit("hall", function (this: TestUnit) {
     }, { concurrent: true });
     this.appendCase("leave seat.", async function (this: TestCase) {
         const hall = new Hall<number>();
-        let rcv = [];
+        let rcv: number[] = [];
         const tpl = hall.attend(() => rcv.push(1));
         hall.attend(() => rcv.push(2));
         hall.leave(tpl.seatNum);

@@ -14,7 +14,7 @@ export namespace UObj {
         t: T, s: S, keys?: (keyof S)[], keepDtypeClass?: boolean): T & Partial<S> {
         for (const k of keys ?? Object.keys(s)) if (UType.isDefined(s[k]))
             if (keepDtypeClass && UType.isObject(t[k]) && UType.isObject(s[k]) && t[k]?.[smbl_tm]) {
-                assignProperties(t[k], s[k], null, true);
+                assignProperties(t[k], s[k], undefined, true);
             } else t[k] = s[k];
         return t;
     }
@@ -45,7 +45,7 @@ export namespace UObj {
                 if (tm[k].cls) crop(o[k], tm[k]?.cls);
                 else {
                     const vCtor = tm[k].ary?.cls ?? tm[k].rcd?.cls;
-                    Object.values(o[k]).forEach(v => crop(v, vCtor));
+                    Object.values(o[k]).forEach(v => crop(v!, vCtor));
                 }
             }
             const rm = _removeKeys === _keys.includes(k);
@@ -84,11 +84,11 @@ export namespace UObj {
         const _recursive = !UType.isDefined(op?.recursive) || op?.recursive;
         const rec = (_o: object) => {
             for (const k in _o) {
-                const prop = _o[k];
+                const prop = (_o as any)[k];
                 if (_ignoreEmpty && UType.isEmpty(prop)) continue;
                 if (UType.isObject(prop) && _recursive) rec(prop);
                 else if (!UType.isFunction(prop) && (!target || target.some(t => typeof prop === t)))
-                    _o[k] = process(prop, k);
+                    (_o as any)[k] = process(prop, k);
             }
         };
         rec(o);

@@ -42,9 +42,9 @@ export namespace UType {
         if (td.t && typeof prop !== td.t) return [k];
         const joinKey = (k2: string) => `${k}.${k2}`;
         if (td.ary) return Array.isArray(prop)
-            ? prop.flatMap((e, i) => validateProp(i.toString(), e, td.ary)).map(joinKey) : [k];
+            ? prop.flatMap((e, i) => validateProp(i.toString(), e, td.ary!)).map(joinKey) : [k];
         if (td.rcd) return UType.isObject(prop)
-            ? Object.entries(prop).flatMap(e => validateProp(e[0], e[1], td.rcd)).map(joinKey) : [k];
+            ? Object.entries(prop).flatMap(e => validateProp(e[0], e[1], td.rcd!)).map(joinKey) : [k];
         if (td.cls) return validate(prop, td.cls).flatMap(joinKey);
         return [];
     }

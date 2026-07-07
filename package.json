@@ -40,9 +40,9 @@
     }
   },
   "devDependencies": {
-    "@types/node": "^24.2.1",
+    "@types/node": "^26.1.0",
     "tsx": "^4.20.3",
-    "typescript": "^5.8.3",
+    "typescript": "^6.0.3",
     "xjs-test": "^1.1.0"
   }
 }

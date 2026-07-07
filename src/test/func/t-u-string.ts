@@ -82,7 +82,7 @@ mt.appendUnit("asUsd", function (this: TestUnit) {
         this.check(usd === "$0", () => `actual => ${usd}`);
     });
     this.appendCase("handle null.", function (this: TestCase) {
-        const usd = UString.asUsd(null);
+        const usd = UString.asUsd(null as any); // for ts lower than v6.
         this.check(usd === "", () => `actual => ${usd}`);
     });
     this.appendCase("handle negative.", function (this: TestCase) {
@@ -104,7 +104,7 @@ mt.appendUnit("asJpy", function (this: TestUnit) {
         this.check(jpy === "¥0", () => `actual => ${jpy}`);
     });
     this.appendCase("handle null.", function (this: TestCase) {
-        const jpy = UString.asJpy(null);
+        const jpy = UString.asJpy(null as any); // for ts lower than v6.
         this.check(jpy === "", () => `actual => ${jpy}`);
     });
 });
@@ -122,7 +122,7 @@ mt.appendUnit("asPercentage", function (this: TestUnit) {
         this.check(actual === "0%", () => `actual => ${actual}`);
     });
     this.appendCase("handle null.", function (this: TestCase) {
-        const actual = UString.asPercentage(null);
+        const actual = UString.asPercentage(null as any); // for ts lower than v6.
         this.check(actual === "", () => `actual => ${actual}`);
     });
 });

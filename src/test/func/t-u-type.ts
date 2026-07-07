@@ -28,7 +28,7 @@ mt.appendUnit("validate", function (this: TestUnit<{
         Object.assign(c.class_a, { id: "1" });
         this.check(UArray.eq(UType.validate(c.class_a), ["id"]));
     });
-    this.chainContextGen(c => { c.class_a.id = 1; return c; })
+    this.chainContextGen(c => { c.class_a!.id = 1; return c; })
     this.appendCase("string decorator works.", function (this: TestCase, c) {
         Object.assign(c.class_a, { b: 2 });
         this.check(UArray.eq(UType.validate(c.class_a), ["b"]));

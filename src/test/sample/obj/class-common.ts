@@ -4,21 +4,21 @@ import { IF_C } from "./if-common";
 
 export abstract class CLS_Base {
     @DType.number
-    x: number;
+    x?: number;
     constructor() { }
 }
 export class CLS_B extends CLS_Base {
     @DType.required
     @DType.number
-    id: number;
+    id?: number;
     @DType.required
     @DType.array({ t: Type.number })
-    d: number[];
+    d?: number[];
     @DType.required
     @DType.boolean
-    e: boolean;
+    e?: boolean;
     @DType.object(CLS_B)
-    cls_b: CLS_B;
+    cls_b?: CLS_B;
     q: any;
     constructor(
         id?: number,
@@ -36,13 +36,13 @@ export class CLS_B extends CLS_Base {
 export class CLS_A extends CLS_Base {
     @DType.required
     @DType.number
-    id: number;
+    id?: number;
     @DType.number
-    a: number;
+    a?: number;
     @DType.string
-    b: string;
+    b?: string;
     @DType.object(CLS_B)
-    cls_b: CLS_B;
+    cls_b?: CLS_B;
     p: any;
     @DType.record({ t: Type.number })
     record: any;

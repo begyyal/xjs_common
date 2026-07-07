@@ -36,11 +36,11 @@ export namespace UArray {
     export function distinct<T>(array: T[],
         op?: { k?: keyof T, predicate?: (v1: T, v2: T) => boolean, takeLast?: boolean }): T[] {
         if (!array || array.length === 0) return [];
-        if (op?.k) return Array.from(Array2.map(array, e => e[op.k]).values()).map(a => op?.takeLast ? a.pop() : a.shift());
+        if (op?.k) return Array.from(Array2.map(array, e => e[op.k!]).values()).map(a => op?.takeLast ? a.pop()! : a.shift()!);
         const a = op?.takeLast ? [...array].reverse() : [...array];
         const p = op?.predicate ?? ((v1, v2) => v1 == v2);
-        const result = [a.shift()];
-        a.forEach(v => result.some(v2 => p(v, v2)) ? {} : result.push(v));
+        const result = [a.shift()!];
+        a.forEach(v => result.some(v2 => p(v, v2)) ? {} : result.push(v!));
         return result;
     }
     /**
@@ -52,11 +52,11 @@ export namespace UArray {
     export function duplicate<T>(array: T[], op?: { predicate?: (v1: T, v2: T) => boolean }): T[]
     export function duplicate<T>(array: T[], op?: { k?: keyof T, predicate?: (v1: T, v2: T) => boolean }): T[] {
         if (!array || array.length === 0) return [];
-        if (op?.k) return Array.from(Array2.map(array, e => e[op.k]).values()).filter(a => a.length > 1).flat();
+        if (op?.k) return Array.from(Array2.map(array, e => e[op.k!]).values()).filter(a => a.length > 1).flat();
         const a = [...array], result = [];
         const p = op?.predicate ?? ((v1, v2) => v1 == v2);
         while (a.length > 0) {
-            const e = a.pop();
+            const e = a.pop()!;
             let dup: T[] = [];
             for (let i = a.length - 1, e2: T = a[i]; i >= 0; i--, e2 = a[i])
                 if (p(e, e2)) { a.splice(i, 1); dup.push(e2); }
@@ -120,9 +120,9 @@ export namespace UArray {
         return result;
     }
     export async function parallelForEach<T, R>(array: T[], predicate: (e: T, i: number) => Promise<R>, paraCount: number = 3): Promise<R[]> {
-        let ret = [], queues = [...array];
+        let ret: R[] = [], queues = [...array];
         const consume = async () => {
-            while (queues.length > 0) ret.push(await predicate(queues.shift(), array.length - queues.length - 1));
+            while (queues.length > 0) ret.push(await predicate(queues.shift()!, array.length - queues.length - 1));
         };
         await Promise.all(int2array(paraCount).map(() => consume()));
         return ret.filter(UType.isDefined);

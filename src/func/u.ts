@@ -62,13 +62,13 @@ export function retry<T>(cb: () => MaybePromise<T>, op?: SyncRetryOption | Async
             l.warn(`[XJS] it does retry of ${initialCount - c}th time to the call back.`);
             l.warn(e);
         }
-        let ret = null;
+        let ret: MaybePromise<T> = null as any;
         const innerPrcs = () => {
             try { ret = cb(); } catch (e) { if (handleError(e)) ret = prcs(c - 1, e); else throw e; }
             if (ret instanceof Promise) {
                 return new Promise((resolve, reject) =>
-                    ret.then(resolve).catch((e: any) => {
-                        if (handleError(e)) try { ret = resolve(prcs(c - 1, e)); } catch (e2) { reject(e2); }
+                    (ret as Promise<T>).then(resolve).catch((e: any) => {
+                        if (handleError(e)) try { resolve(prcs(c - 1, e)); } catch (e2) { reject(e2); }
                         else reject(e);
                     }));
             } else return ret;

@@ -13,7 +13,7 @@ mt.appendUnit("distinct", function (this: TestUnit<{
     before: number
 }>) {
     this.chainContextGen(_ => ({ rcds: genIF_A(3) }));
-    this.chainContextGen(c => ({ before: c.rcds.length }));
+    this.chainContextGen(c => ({ before: c.rcds!.length }));
     this.appendCase("basic functionality with property key.", function (this: TestCase, c) {
         c.rcds.push(...genIF_A(3));
         c.rcds = UArray.distinct(c.rcds, { k: "id" });
@@ -23,7 +23,7 @@ mt.appendUnit("distinct", function (this: TestUnit<{
         c.rcds.push(...genIF_A(3));
         c.rcds[0].a = "z";
         c.rcds = UArray.distinct(c.rcds, { k: "id" });
-        this.check(c.rcds.find(r => r.id === 0).a === "z");
+        this.check(c.rcds.find(r => r.id === 0)?.a === "z");
     });
     this.appendCase("basic functionality with filter predicate.", function (this: TestCase, c) {
         c.rcds.push(...genIF_A(3));
@@ -34,13 +34,13 @@ mt.appendUnit("distinct", function (this: TestUnit<{
         c.rcds.push(...genIF_A(3));
         c.rcds[0].a = "z";
         c.rcds = UArray.distinct(c.rcds, { predicate: (v1, v2) => v1.id === v2.id });
-        this.check(c.rcds.find(r => r.id === 0).a === "z");
+        this.check(c.rcds.find(r => r.id === 0)?.a === "z");
     });
     this.appendCase("take last element.", function (this: TestCase, c) {
         c.rcds.push(...genIF_A(3));
         c.rcds[0].a = "z";
         c.rcds = UArray.distinct(c.rcds, { k: "id", takeLast: true });
-        this.check(c.rcds.find(r => r.id === 0).a !== "z");
+        this.check(c.rcds.find(r => r.id === 0)?.a !== "z");
     });
     this.chainContextGen(_ => ({ array: [1, 2, 4, 1, 2, 3, 6, 7, 3, 4, 6, 9, 2, 5, 0, 8] }))
     this.appendCase("basic functionality with number array.", function (this: TestCase, c) {
@@ -96,7 +96,7 @@ mt.appendUnit("eq", function (this: TestUnit<{
         this.check(UArray.eq(c.array1, c.array1) && !UArray.eq(c.array1, c.array3));
     });
     this.appendCase("consider empty values as the same.", function (this: TestCase, c) {
-        this.check(UArray.eq(null, undefined));
+        this.check(UArray.eq(null as any, undefined as any));
     });
     this.appendCase("has type compatibility to AlmostArray.", function (this: TestCase, c) {
         this.check(UArray.eq(c.aa, c.aa));
@@ -119,7 +119,7 @@ mt.appendUnit("randomPick", function (this: TestUnit<{
     before: number
 }>) {
     this.chainContextGen(_ => ({ array: int2array(10) }));
-    this.chainContextGen(c => ({ before: c.array.length }));
+    this.chainContextGen(c => ({ before: c.array!.length }));
     this.appendCase("takeout option works as false.", function (this: TestCase, c) {
         const res = UArray.randomPick(c.array, { takeout: false });
         this.check(c.array.length === c.before && !UType.isArray(res));
@@ -150,7 +150,7 @@ mt.appendUnit("shuffle", function (this: TestUnit<{
     ret: number[]
 }>) {
     this.chainContextGen(_ => ({ array: int2array(10000) }));
-    this.chainContextGen(c => ({ ret: UArray.shuffle(c.array) }));
+    this.chainContextGen(c => ({ ret: UArray.shuffle(c.array!) }));
     this.appendCase("elements is not mutated.", function (this: TestCase, c) {
         this.check(UArray.eq(c.array, int2array(c.array.length), { sort: false }))
     });
@@ -159,7 +159,7 @@ mt.appendUnit("shuffle", function (this: TestUnit<{
     });
     this.clearContextGen();
     this.chainContextGen(_ => ({ array: int2array(1) }));
-    this.chainContextGen(c => ({ ret: UArray.shuffle(c.array) }));
+    this.chainContextGen(c => ({ ret: UArray.shuffle(c.array!) }));
     this.appendCase("returns array type even if the array length is less than one.", function (this: TestCase, c) {
         this.check(UType.isArray(c.ret, Type.number));
     });
@@ -177,7 +177,7 @@ mt.appendUnit("chop", function (this: TestUnit) {
 });
 mt.appendUnit("parallelForEach", function (this: TestUnit) {
     this.appendCase("basic functionality", async function (this: TestCase) {
-        const ary = [];
+        const ary: number[] = [];
         await UArray.parallelForEach([1, 2, 3], async n => {
             ary.push(n);
             await delay(0.1).then(() => ary.push(n));
@@ -185,7 +185,7 @@ mt.appendUnit("parallelForEach", function (this: TestUnit) {
         this.check(UArray.eq(ary, [1, 2, 3, 1, 2, 3], { sort: false }), () => `actual => ${ary}`);
     }, { concurrent: true });
     this.appendCase("set parallel count.", async function (this: TestCase) {
-        const ary = [];
+        const ary: number[] = [];
         await UArray.parallelForEach([1, 2, 3], async n => {
             ary.push(n);
             await delay(0.1).then(() => ary.push(n));
@@ -193,7 +193,7 @@ mt.appendUnit("parallelForEach", function (this: TestUnit) {
         this.check(UArray.eq(ary, [1, 2, 1, 3, 2, 3], { sort: false }), () => `actual => ${ary}`);
     }, { concurrent: true });
     this.appendCase("pass queue index to callback.", async function (this: TestCase) {
-        const ary = [];
+        const ary: number[] = [];
         await UArray.parallelForEach([3, 2, 1], async (_, i) => {
             await delay(0.1).then(() => ary.push(i));
         });

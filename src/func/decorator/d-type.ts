@@ -22,7 +22,7 @@ type ArrayTypeDesc = TypeDesc & { t?: never, obj?: never, rec?: never, rcd?: nev
 type ClassTypeDesc = TypeDesc & { t?: never, ary?: never, rec?: never, rcd?: never };
 type RecordTypeDesc = TypeDesc & { t?: never, arys?: never, obj?: never, rec?: never };
 type AnyTypeDesc = BasicTypeDesc | ArrayTypeDesc | ClassTypeDesc | RecordTypeDesc;
-export interface TypeMap { [k: string]: TypeDesc }
+export type TypeMap = Record<string, TypeDesc>;
 /** 
  * decorators to be validated by {@link UType.validate},
  * and to be cropped by {@link UObj.crop}.
@@ -77,8 +77,8 @@ export namespace DType {
         setDesc(target, propKey, (_) => { });
     }
     function setDesc(target: Object, propKey: string, setter: (td: TypeDesc) => void): void {
-        const map: TypeMap = target[smbl_tm] ? Object.assign({}, target[smbl_tm]) : {};
-        map[propKey] ??= { t: null, req: false, cls: null, ary: null, rcd: null };
+        const map: TypeMap = (target as any)[smbl_tm] ? Object.assign({}, (target as any)[smbl_tm]) : {};
+        map[propKey] ??= { req: false };
         const td = map[propKey];
         setter(td);
         const structualDescs = [[td.ary, "array"], [td.cls, "class"], [td.rcd, "record"]].filter(e => e[0]);
