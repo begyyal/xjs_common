@@ -93,7 +93,7 @@ export namespace UString {
     export function snake2camel(snake: string): string {
         return snake?.replaceAll(/_./g, c => c.charAt(1).toUpperCase());
     }
-    function asAmount(amount: number, unit: string): string {
+    export function asAmount(amount: number, unit: string = ""): string {
         const int2dec = Math.abs(amount).toString().split(".");
         const etni = reverse(int2dec[0]);
         let fetni = "";

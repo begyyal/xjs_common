@@ -68,6 +68,11 @@ mt.appendUnit("simpleTime", function (this: TestUnit) {
         this.check(UString.is_yyyy(year), () => year);
     });
 });
+mt.appendUnit("asAmount", function (this: TestUnit) {
+    this.appendCase("basic functionality", function (this: TestCase) {
+        this.check(UString.asAmount(1234567) === "1,234,567");
+    });
+});
 mt.appendUnit("asUsd", function (this: TestUnit) {
     this.appendCase("basic functionality", function (this: TestCase) {
         const usd = UString.asUsd(1000000);
