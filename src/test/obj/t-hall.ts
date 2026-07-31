@@ -62,7 +62,7 @@ mt.appendUnit("hall", function (this: TestUnit) {
         hall.speak(1);
         hall.breakUp();
         await hall.awaitBreakingUp();
-        this.check(rcv);
+        this.check(rcv && hall.isNoAudiences);
     }, { concurrent: true });
     this.appendCase("process precedent statement.", async function (this: TestCase) {
         const hall = new Hall<number>();
@@ -75,9 +75,10 @@ mt.appendUnit("hall", function (this: TestUnit) {
     this.appendCase("leave seat.", async function (this: TestCase) {
         const hall = new Hall<number>();
         let rcv: number[] = [];
-        const tpl = hall.attend(() => rcv.push(1));
+        const { seatNum } = hall.attend(() => rcv.push(1));
         hall.attend(() => rcv.push(2));
-        hall.leave(tpl.seatNum);
+        this.check(!hall.isNoAudiences);
+        hall.leave(seatNum);
         await hall.speak(1);
         this.check(UArray.eq(rcv, [2], { sort: false }));
         this.expectError();

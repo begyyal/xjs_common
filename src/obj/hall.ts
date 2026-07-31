@@ -17,6 +17,7 @@ export class Hall<T> {
     private _lidTop = 0;
     /** what {@link speak()|spoke} last. */
     currentStatement?: T;
+    get isNoAudiences() { return this._listener.length === 0; }
     /**
      * @param op.takingNotesMsec queue processing timeout milliseconds. (what speak is processed sequentially each audience.) default is 30 seconds.
      */
