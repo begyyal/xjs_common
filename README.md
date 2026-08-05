@@ -32,11 +32,6 @@ import { delay, waitFor, int2array, UHttp, retry, MaybeArray, Loggable, valueof 
     let maybeArray: MaybeArray<number> = 0; // also number array is applicable.
     let logger: Loggable = console; // object implements log/warn/error is applicable.
 
-    // true
-    console.log(UHttp.isHttpSuccess(204));
-    // https://aaa.com?p1=a&p2=1&p2=2
-    console.log(UHttp.concatParamsWithEncoding("https://aaa.com", { p1: "a", p2: ["1", "2"] }));
-
     enum EnumA { A = 1, B = "b", C = "3" }
     console.log(UEnum.values(EnumA)); // [1, "b", "3"]
     // checks and casts a value like enum valueof.
