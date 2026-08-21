@@ -25,60 +25,60 @@ mt.appendUnit("validate", function (this: TestUnit<{
         this.check(UArray.eq(UType.validate(c.class_a), ["id"]));
     });
     this.appendCase("number decorator works.", function (this: TestCase, c) {
-        Object.assign(c.class_a, { id: "1" });
+        Object.assign(c.class_a!, { id: "1" });
         this.check(UArray.eq(UType.validate(c.class_a), ["id"]));
     });
     this.chainContextGen(c => { c.class_a!.id = 1; return c; })
     this.appendCase("string decorator works.", function (this: TestCase, c) {
-        Object.assign(c.class_a, { b: 2 });
+        Object.assign(c.class_a!, { b: 2 });
         this.check(UArray.eq(UType.validate(c.class_a), ["b"]));
     });
     this.chainContextGen(_ => ({ class_b: new CLS_B(2) }));
     this.appendCase("recursive decorator works.", function (this: TestCase, c) {
-        Object.assign(c.class_a, { cls_b: c.class_b });
+        Object.assign(c.class_a!, { cls_b: c.class_b });
         const actual = UType.validate(c.class_a);
         this.check(UArray.eq(actual, ["cls_b.d", "cls_b.e"]), () => `actual => ${actual}`);
     });
     this.appendCase("array decorator works.", function (this: TestCase, c) {
-        Object.assign(c.class_b, { d: 3, e: true });
-        Object.assign(c.class_a, { cls_b: c.class_b });
+        Object.assign(c.class_b!, { d: 3, e: true });
+        Object.assign(c.class_a!, { cls_b: c.class_b });
         this.check(UArray.eq(UType.validate(c.class_a), ["cls_b.d"]));
     });
     this.appendCase("check valid types in array.", function (this: TestCase, c) {
-        Object.assign(c.class_b, { e: true, d: [3] });
-        Object.assign(c.class_a, { cls_b: c.class_b });
+        Object.assign(c.class_b!, { e: true, d: [3] });
+        Object.assign(c.class_a!, { cls_b: c.class_b });
         const actual = UType.validate(c.class_a);
         this.check(actual.length === 0, () => `actual => ${actual}`);
     });
     this.appendCase("check invalid types in array.", function (this: TestCase, c) {
-        Object.assign(c.class_b, { e: true, d: ["3"] });
-        Object.assign(c.class_a, { cls_b: c.class_b });
+        Object.assign(c.class_b!, { e: true, d: ["3"] });
+        Object.assign(c.class_a!, { cls_b: c.class_b });
         this.check(UArray.eq(UType.validate(c.class_a), ["cls_b.d.0"]));
     });
     this.appendCase("property decorated as array can accept empty array.", function (this: TestCase, c) {
-        Object.assign(c.class_b, { e: true, d: [] });
-        Object.assign(c.class_a, { cls_b: c.class_b });
+        Object.assign(c.class_b!, { e: true, d: [] });
+        Object.assign(c.class_a!, { cls_b: c.class_b });
         this.check(UType.validate(c.class_a).length === 0);
     });
     this.appendCase("boolean decorator detects invalid value.", function (this: TestCase, c) {
-        Object.assign(c.class_b, { e: 123, d: [] });
-        Object.assign(c.class_a, { cls_b: c.class_b });
+        Object.assign(c.class_b!, { e: 123, d: [] });
+        Object.assign(c.class_a!, { cls_b: c.class_b });
         this.check(UArray.eq(UType.validate(c.class_a), ["cls_b.e"]));
     });
     this.appendCase("decorators in super class works.", function (this: TestCase, c) {
-        Object.assign(c.class_a, { x: "a" });
+        Object.assign(c.class_a!, { x: "a" });
         this.check(UArray.eq(UType.validate(c.class_a), ["x"]));
     });
     this.appendCase("record decorator checks a type.", function (this: TestCase, c) {
-        Object.assign(c.class_a, { record: "a" });
+        Object.assign(c.class_a!, { record: "a" });
         this.check(UArray.eq(UType.validate(c.class_a), ["record"]));
     });
     this.appendCase("record decorator checks property types of an object.", function (this: TestCase, c) {
-        Object.assign(c.class_a, { record: { a: 1, b: "bb" } });
+        Object.assign(c.class_a!, { record: { a: 1, b: "bb" } });
         this.check(UArray.eq(UType.validate(c.class_a), ["record.b"]));
     });
     this.appendCase("record decorator accepts a valid object.", function (this: TestCase, c) {
-        Object.assign(c.class_a, { record: { a: 1, b: 2 } });
+        Object.assign(c.class_a!, { record: { a: 1, b: 2 } });
         this.check(UType.validate(c.class_a).length === 0);
     });
     this.clearContextGen();
@@ -104,7 +104,7 @@ mt.appendUnit("isArray", function (this: TestUnit<{
         this.check(!UType.isArray(c.array, Type.number));
     });
     this.appendCase("check valid types.", function (this: TestCase, c) {
-        c.array.pop();
+        c.array!.pop();
         this.check(UType.isArray(c.array, Type.number));
     });
 });

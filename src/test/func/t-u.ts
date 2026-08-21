@@ -1,7 +1,6 @@
 import { ModuleTest, s_emptyLogger, TestCase, TestUnit } from "xjs-test";
 import { TimeUnit } from "../../const/time-unit";
 import { delay, int2array, retry, toMsec, waitFor } from "../../func/u";
-import { UArray } from "../../func/u-array";
 
 const mt = new ModuleTest("T_U");
 mt.appendUnit("int2array", function (this: TestUnit) {
@@ -28,7 +27,10 @@ mt.appendUnit("retry", function (this: TestUnit<{
         cb: () => { c.counter! += 1; return c.counter; }
     }));
     this.appendCase("result value from callback is returned correctly.", function (this: TestCase, c) {
-        this.check(retry(c.cb, { count: 2, logger: s_emptyLogger }) === 1);
+        this.check(retry(c.cb!, { count: 2, logger: s_emptyLogger }) === 1);
+    }, { concurrent: true });
+    this.appendCase("handling a result using resultHandler.", function (this: TestCase, c) {
+        this.check(retry(c.cb!, { count: 2, resultHandler: r => r === 1, logger: s_emptyLogger }) === 2);
     }, { concurrent: true });
     this.chainContextGen(c => ({
         cb: () => {
@@ -39,10 +41,10 @@ mt.appendUnit("retry", function (this: TestUnit<{
     }));
     this.appendCase("callback is retried by default retryable count correctly.", function (this: TestCase, c) {
         this.expectError(e => e === 2);
-        retry(c.cb, { logger: s_emptyLogger });
+        retry(c.cb!, { logger: s_emptyLogger });
     }, { concurrent: true });
     this.appendCase("specified retry count is working.", function (this: TestCase, c) {
-        const ret = retry(c.cb, { count: 2, logger: s_emptyLogger });
+        const ret = retry(c.cb!, { count: 2, logger: s_emptyLogger });
         this.check(ret === 3);
     }, { concurrent: true });
     this.chainContextGen(c => ({
@@ -54,37 +56,38 @@ mt.appendUnit("retry", function (this: TestUnit<{
         }
     }));
     this.appendCase("async callback is working.", async function (this: TestCase, c) {
-        const ret = await retry(c.cbAsync, { count: 2, logger: s_emptyLogger });
+        const ret = await retry(c.cbAsync!, { count: 2, logger: s_emptyLogger });
         this.check(ret === 3);
     }, { concurrent: true });
-    this.appendCase("error criterion is working.", async function (this: TestCase, c) {
-        try { await retry(c.cbAsync, { errorCriterion: e => e != 1, logger: s_emptyLogger }); } catch { /** pass here is correct. */ }
+    this.appendCase("handling an exception using resultHandler.", async function (this: TestCase, c) {
+        try { await retry(c.cbAsync!, { resultHandler: (_, e) => e != 1, logger: s_emptyLogger }); } catch { /** pass here is correct. */ }
         this.check(c.counter === 1);
-    }, { concurrent: true });
-    this.appendCase("interval predicate is working.", async function (this: TestCase, c) {
-        try {
-            await retry(c.cbAsync, {
-                intervalPredicate: () => delay(0.001).then(() => c.array.push(-1)),
-                errorCriterion: e => e === 1, logger: s_emptyLogger, count: 2
-            });
-        } catch { }
-        this.check(UArray.eq(c.array, [0, -1, 1, -1, 2], { sort: false }));
     }, { concurrent: true });
     this.chainContextGen(() => ({
         cb: () => { throw 1; },
         array: [Date.now()]
     }));
     this.appendCase("intervalSec is working.", async function (this: TestCase, c) {
-        try {
-            await retry(c.cb, {
-                intervalSec: 0.6,
-                intervalPredicate: () => c.array.push(Date.now()),
-                errorCriterion: e => e === 1, logger: s_emptyLogger, count: 2
-            });
-        } catch { }
+        await retry(c.cb!, {
+            intervalSec: 0.6,
+            resultHandler: (_, e) => {
+                c.array!.push(Date.now());
+                return e === 1;
+            }, logger: s_emptyLogger, count: 2
+        }).catch(() => { });
         // set 50 msec as time error...
-        this.check(c.array[1] - c.array[0] < 550, () => c.array[1] - c.array[0]);
-        this.check(c.array[2] - c.array[1] >= 550, () => c.array[2] - c.array[1]);
+        this.check(c.array![1] - c.array![0] < 550, () => c.array![1] - c.array![0]);
+        this.check(c.array![2] - c.array![1] >= 550, () => c.array![2] - c.array![1]);
+    }, { concurrent: true });
+    this.appendCase("async resultHandler works correctly.", async function (this: TestCase, c) {
+        await retry(c.cb!, {
+            resultHandler: async (_, e) => {
+                await delay(0.5);
+                c.array!.push(Date.now());
+                return e === 1;
+            }, logger: s_emptyLogger, count: 2
+        }).catch(() => { });
+        this.check(c.array![2] - c.array![0] > 1_000, () => c.array![2] - c.array![0]);
     }, { concurrent: true });
 }, { concurrent: true });
 mt.appendUnit("toMsec", function (this: TestUnit) {

@@ -2,6 +2,7 @@ import { TimeUnit } from "../const/time-unit";
 import { Loggable, MaybePromise } from "../const/types";
 import { XjsErrCode } from "../const/xjs-err-code";
 import { XjsErr } from "../obj/xjs-err";
+import { UType } from "./u-type";
 
 export function delay(sec: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, 1000 * sec));
@@ -11,7 +12,7 @@ export function int2array(size: number): number[] {
     if (Number.isNaN(s)) throw new XjsErr(XjsErrCode.U, "size of the argument is not number.");
     return Array.from(Array(s).keys());
 }
-export interface RetryOption<T = MaybePromise> {
+export interface RetryOption<T, HT = MaybePromise<boolean>> {
     /**
      * number of retries. default is 1.
      */
@@ -21,18 +22,15 @@ export interface RetryOption<T = MaybePromise> {
      */
     logger?: Loggable;
     /**
-     * distinguishes whether retry is required from exceptions. default is none. (i.e. always required.)
+     * callback for handling the result of the main callback or an exception. 
+     * this callback returns a boolean signifies whether retry is required.
      */
-    errorCriterion?: (e: any) => boolean;
-    /**
-     * predicate that runs between callbacks when retrying.
-     */
-    intervalPredicate?: () => T;
+    resultHandler?: (result?: T, exception?: any) => HT;
 };
-export interface SyncRetryOption extends RetryOption<void> { };
-export interface AsyncRetryOption extends RetryOption {
+export interface SyncRetryOption<T> extends RetryOption<T, boolean> { };
+export interface AsyncRetryOption<T> extends RetryOption<T> {
     /**
-     * seconds to wait between callbacks. this wait occurs after `intervalPredicate`.
+     * seconds to wait between callbacks. this wait occurs after `resultHandler`.
      */
     intervalSec?: number;
 };
@@ -41,45 +39,49 @@ export interface AsyncRetryOption extends RetryOption {
  * @param cb callback to be retried.
  * @param op.count {@link RetryOption.count}
  * @param op.logger {@link RetryOption.logger}
- * @param op.errorCriterion {@link RetryOption.errorCriterion}
+ * @param op.resultHandler {@link RetryOption.resultHandler}
  * @param op.intervalSec {@link AsyncRetryOption.intervalSec}
- * @param op.intervalPredicate {@link RetryOption.intervalPredicate}
  */
-export function retry<T>(cb: () => T, op?: SyncRetryOption): T;
-export function retry<T>(cb: () => T, op?: AsyncRetryOption): Promise<T>;
-export function retry<T>(cb: () => Promise<T>, op?: SyncRetryOption): Promise<T>;
-export function retry<T>(cb: () => Promise<T>, op?: AsyncRetryOption): Promise<T>;
-export function retry<T>(cb: () => MaybePromise<T>, op?: SyncRetryOption | AsyncRetryOption): MaybePromise<T> {
+export function retry<T>(cb: () => T, op?: SyncRetryOption<T>): T;
+export function retry<T>(cb: () => T, op?: AsyncRetryOption<T>): Promise<T>;
+export function retry<T>(cb: () => Promise<T>, op?: SyncRetryOption<T>): Promise<T>;
+export function retry<T>(cb: () => Promise<T>, op?: AsyncRetryOption<T>): Promise<T>;
+export function retry<T>(cb: () => MaybePromise<T>, op?: SyncRetryOption<T> | AsyncRetryOption<T>): MaybePromise<T> {
     const l = op?.logger ?? console;
-    const initialCount = op?.count ?? 1;
-    const handleError = (e: any) => !op?.errorCriterion || op.errorCriterion(e);
-    const prcs = (c: number, e?: any) => {
+    const initialCount = op?.count ?? 1, intervalSec = (op as AsyncRetryOption<T>)?.intervalSec;
+    let ret: MaybePromise<T> = null as any, e: any = null;
+    const prcs = (c: number): MaybePromise<T> => {
         if (c < 0) {
             l.error("[XJS] failure exceeds retryable count.");
             throw e ?? new XjsErr(XjsErrCode.U, "failure exceeds retryable count.", e);
         }
-        if (e) {
-            l.warn(`[XJS] it does retry of ${initialCount - c}th time to the call back.`);
-            l.warn(e);
-        }
-        let ret: MaybePromise<T> = null as any;
-        const innerPrcs = () => {
-            try { ret = cb(); } catch (e) { if (handleError(e)) ret = prcs(c - 1, e); else throw e; }
-            if (ret instanceof Promise) {
-                return new Promise((resolve, reject) =>
-                    (ret as Promise<T>).then(resolve).catch((e: any) => {
-                        if (handleError(e)) try { resolve(prcs(c - 1, e)); } catch (e2) { reject(e2); }
-                        else reject(e);
-                    }));
-            } else return ret;
-        };
-        const chain = (c: () => any) => ret instanceof Promise ? ret.then(() => c()) : c();
         if (c < initialCount) {
-            if (op?.intervalPredicate) ret = op?.intervalPredicate();
-            const intervalSec = (op as AsyncRetryOption)?.intervalSec;
-            if (intervalSec) ret = chain(() => delay(intervalSec));
+            l.warn(`[XJS] it does retry of ${initialCount - c}th time to the call back.`);
+            if (e) l.warn(e);
         }
-        return chain(innerPrcs);
+        const handleResult = (r?: T, exp?: boolean) => {
+            const nextPrcs = () => intervalSec ? delay(intervalSec).then(() => prcs(c - 1)) : prcs(c - 1);
+            if (op?.resultHandler) {
+                const classify = (hr: boolean) => {
+                    if (hr) return nextPrcs();
+                    else if (e) throw e;
+                    else return r!;
+                };
+                const hr = op?.resultHandler(r, e);
+                if (hr instanceof Promise) return hr.then(classify);
+                else return classify(hr);
+            } else return exp ? nextPrcs() : r!;
+        };
+        try {
+            ret = cb();
+            if (ret instanceof Promise)
+                ret = ret.then(r => handleResult(r))
+                    .catch(e2 => { e = e2; return handleResult(undefined, true); });
+            else ret = handleResult(ret);
+        } catch (e2) {
+            e = e2; ret = handleResult(undefined, true);
+        }
+        return ret;
     };
     return prcs(initialCount);
 }

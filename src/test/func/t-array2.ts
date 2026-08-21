@@ -11,12 +11,12 @@ mt.appendUnit("map", function (this: TestUnit<{
 }>) {
     this.chainContextGen(_ => ({ array1: genIF_A(3), array2: genIF_B(3) }));
     this.appendCase("basic functionality.", function (this: TestCase, c) {
-        const map = Array2.map([...c.array1, ...c.array2], v => v.id);
+        const map = Array2.map([...c.array1!, ...c.array2!], v => v.id);
         this.check(Array.from(map.keys()).length === 3);
         this.check(Array.from(map.values()).every(v => v.length === 2));
     });
     this.appendCase("off accumulation.", function (this: TestCase, c) {
-        const map = Array2.map([...c.array1, ...c.array2], v => v.id, { accumulate: false });
+        const map = Array2.map([...c.array1!, ...c.array2!], v => v.id, { accumulate: false });
         this.check(Array.from(map.keys()).length === 3);
         this.check(Array.from(map.values()).every(v => !UType.isArray(v)));
     });
@@ -26,16 +26,16 @@ mt.appendUnit("record", function (this: TestUnit<{
 }>) {
     this.chainContextGen(_ => ({ numary: [1, 2, 3] }));
     this.appendCase("basic functionality.", function (this: TestCase, c) {
-        const o = Array2.record(c.numary, { vgen: n => n + "a" });
-        this.check(c.numary.every(n => o[n] === n + "a"));
+        const o = Array2.record(c.numary!, { vgen: n => n + "a" });
+        this.check(c.numary!.every(n => o[n] === n + "a"));
     });
     this.appendCase("pass values.", function (this: TestCase, c) {
-        const o = Array2.record(c.numary, { kgen: n => n + "a" });
-        this.check(c.numary.every(n => o[n + "a"] === n));
+        const o = Array2.record(c.numary!, { kgen: n => n + "a" });
+        this.check(c.numary!.every(n => o[n + "a"] === n));
     });
     this.appendCase("pass entries.", function (this: TestCase, c) {
-        const o = Array2.record(c.numary.map(n => [n, n + "v"] as [number, string]), { kgen: e => e[0], vgen: e => e[1] + "2" });
-        this.check(c.numary.every(n => o[n] === n + "v2"));
+        const o = Array2.record(c.numary!.map(n => [n, n + "v"] as [number, string]), { kgen: e => e[0], vgen: e => e[1] + "2" });
+        this.check(c.numary!.every(n => o[n] === n + "v2"));
     });
 });
 mt.appendUnit("sum", function (this: TestUnit) {

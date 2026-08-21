@@ -25,20 +25,20 @@ const mt = new ModuleTest("T_Exclusive");
 mt.appendUnit("exclusive", function (this: TestUnit<{ cls: Cls }>) {
     this.chainContextGen(_ => ({ cls: new Cls() }));
     this.appendCase("basic functionality", async function (this: TestCase, c) {
-        c.cls.exe(1, 1);
-        await c.cls.exe(0, 2);
-        this.check(UArray.eq(c.cls.array, [1, 2], { sort: false }));
+        c.cls!.exe(1, 1);
+        await c.cls!.exe(0, 2);
+        this.check(UArray.eq(c.cls!.array, [1, 2], { sort: false }));
     });
     this.appendCase("semaphore works correctly.", async function (this: TestCase, c) {
-        c.cls.exe_smp2(2, 1);
-        c.cls.exe_smp2(0.2, 2);
-        await c.cls.exe_smp2(0, 3);
-        this.check(UArray.eq(c.cls.array, [2, 3], { sort: false }), () => c.cls.array);
+        c.cls!.exe_smp2(2, 1);
+        c.cls!.exe_smp2(0.2, 2);
+        await c.cls!.exe_smp2(0, 3);
+        this.check(UArray.eq(c.cls!.array, [2, 3], { sort: false }), () => c.cls!.array);
     });
     this.appendCase("timeout works correctly.", async function (this: TestCase, c) {
         this.expectError();
-        c.cls.exe_to1(1, 1);
-        await c.cls.exe_to1(0, 2);
+        c.cls!.exe_to1(1, 1);
+        await c.cls!.exe_to1(0, 2);
     });
 });
 export const T_Exclusive = mt;

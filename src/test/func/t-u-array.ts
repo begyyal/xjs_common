@@ -13,49 +13,49 @@ mt.appendUnit("distinct", function (this: TestUnit<{
     before: number
 }>) {
     this.chainContextGen(_ => ({ rcds: genIF_A(3) }));
-    this.chainContextGen(c => ({ before: c.rcds!.length }));
+    this.chainContextGen(c => ({ before: c.rcds!!.length }));
     this.appendCase("basic functionality with property key.", function (this: TestCase, c) {
-        c.rcds.push(...genIF_A(3));
-        c.rcds = UArray.distinct(c.rcds, { k: "id" });
-        this.check(c.rcds.length === c.before, () => `lengh change ${c.before} -> ${c.rcds.length}`);
+        c.rcds!.push(...genIF_A(3));
+        c.rcds! = UArray.distinct(c.rcds!, { k: "id" });
+        this.check(c.rcds!.length === c.before, () => `lengh change ${c.before} -> ${c.rcds!.length}`);
     });
     this.appendCase("take first element with property key.", function (this: TestCase, c) {
-        c.rcds.push(...genIF_A(3));
-        c.rcds[0].a = "z";
-        c.rcds = UArray.distinct(c.rcds, { k: "id" });
-        this.check(c.rcds.find(r => r.id === 0)?.a === "z");
+        c.rcds!.push(...genIF_A(3));
+        c.rcds![0].a = "z";
+        c.rcds! = UArray.distinct(c.rcds!, { k: "id" });
+        this.check(c.rcds!.find(r => r.id === 0)?.a === "z");
     });
     this.appendCase("basic functionality with filter predicate.", function (this: TestCase, c) {
-        c.rcds.push(...genIF_A(3));
-        c.rcds = UArray.distinct(c.rcds, { predicate: (v1, v2) => v1.id === v2.id });
-        this.check(c.rcds.length === c.before, () => `lengh change ${c.before} -> ${c.rcds.length}`);
+        c.rcds!.push(...genIF_A(3));
+        c.rcds! = UArray.distinct(c.rcds!, { predicate: (v1, v2) => v1.id === v2.id });
+        this.check(c.rcds!.length === c.before, () => `lengh change ${c.before} -> ${c.rcds!.length}`);
     });
     this.appendCase("take first element with filter predicate.", function (this: TestCase, c) {
-        c.rcds.push(...genIF_A(3));
-        c.rcds[0].a = "z";
-        c.rcds = UArray.distinct(c.rcds, { predicate: (v1, v2) => v1.id === v2.id });
-        this.check(c.rcds.find(r => r.id === 0)?.a === "z");
+        c.rcds!.push(...genIF_A(3));
+        c.rcds![0].a = "z";
+        c.rcds! = UArray.distinct(c.rcds!, { predicate: (v1, v2) => v1.id === v2.id });
+        this.check(c.rcds!.find(r => r.id === 0)?.a === "z");
     });
     this.appendCase("take last element.", function (this: TestCase, c) {
-        c.rcds.push(...genIF_A(3));
-        c.rcds[0].a = "z";
-        c.rcds = UArray.distinct(c.rcds, { k: "id", takeLast: true });
-        this.check(c.rcds.find(r => r.id === 0)?.a !== "z");
+        c.rcds!.push(...genIF_A(3));
+        c.rcds![0].a = "z";
+        c.rcds! = UArray.distinct(c.rcds!, { k: "id", takeLast: true });
+        this.check(c.rcds!.find(r => r.id === 0)?.a !== "z");
     });
     this.chainContextGen(_ => ({ array: [1, 2, 4, 1, 2, 3, 6, 7, 3, 4, 6, 9, 2, 5, 0, 8] }))
     this.appendCase("basic functionality with number array.", function (this: TestCase, c) {
-        this.check(UArray.distinct(c.array).length === 10);
+        this.check(UArray.distinct(c.array!).length === 10);
     });
     this.appendCase("basic functionality with string array.", function (this: TestCase, c) {
-        this.check(UArray.distinct(c.array.map(n => n.toString())).length === 10);
+        this.check(UArray.distinct(c.array!.map(n => n.toString())).length === 10);
     });
     this.clearContextGen();
     this.chainContextGen(_ => ({ rcds: genIF_A(10000) }));
     this.appendCase("keybase processing compress the time significantly. (the ratio less than 3 times)", function (this: TestCase, c) {
-        c.rcds.push(...genIF_A(10000));
-        const rcds_b = [...c.rcds];
+        c.rcds!.push(...genIF_A(10000));
+        const rcds_b = [...c.rcds!];
         let t = Date.now();
-        UArray.distinct(c.rcds, { k: "id" });
+        UArray.distinct(c.rcds!, { k: "id" });
         const timeKeybase = Date.now() - t;
         t = Date.now();
         UArray.distinct(rcds_b, { predicate: (v1, v2) => v1.id === v2.id });
@@ -68,15 +68,15 @@ mt.appendUnit("duplicate", function (this: TestUnit<{
 }>) {
     this.chainContextGen(_ => ({ array1: [1, 2, 2, 3, 4, 5, 5], array2: [...genIF_A(3), ...genIF_A(1)] }));
     this.appendCase("basic functionality.", function (this: TestCase, c) {
-        this.check(UArray.eq(UArray.duplicate(c.array1), [2, 2, 5, 5]));
+        this.check(UArray.eq(UArray.duplicate(c.array1!), [2, 2, 5, 5]));
     });
     this.appendCase("basic functionality with property key.", function (this: TestCase, c) {
-        const ret = UArray.duplicate(c.array2, { k: "id" });
+        const ret = UArray.duplicate(c.array2!, { k: "id" });
         this.check(ret.length === 2 && ret.every(a => a.id === 0));
     });
     this.appendCase("basic functionality with filter predicate.", function (this: TestCase, c) {
-        c.array2[0].a = "x";
-        const ret = UArray.duplicate(c.array2, { predicate: (a, b) => a.a === b.a });
+        c.array2![0].a = "x";
+        const ret = UArray.duplicate(c.array2!, { predicate: (a, b) => a.a === b.a });
         this.check(ret.length === 3 && UArray.eq(ret.map(a => a.id), [0, 1, 2]));
     });
 });
@@ -93,25 +93,25 @@ mt.appendUnit("eq", function (this: TestUnit<{
         aa: new Uint8Array([1, 2, 3, 4, 5])
     }));
     this.appendCase("basic functionality", function (this: TestCase, c) {
-        this.check(UArray.eq(c.array1, c.array1) && !UArray.eq(c.array1, c.array3));
+        this.check(UArray.eq(c.array1!, c.array1!) && !UArray.eq(c.array1!, c.array3!));
     });
     this.appendCase("consider empty values as the same.", function (this: TestCase, c) {
         this.check(UArray.eq(null as any, undefined as any));
     });
     this.appendCase("has type compatibility to AlmostArray.", function (this: TestCase, c) {
-        this.check(UArray.eq(c.aa, c.aa));
+        this.check(UArray.eq(c.aa!, c.aa!));
     });
     this.appendCase("sort flag works as default.", function (this: TestCase, c) {
-        this.check(UArray.eq(c.array1, c.array2));
+        this.check(UArray.eq(c.array1!, c.array2!));
     });
     this.appendCase("useStrictEqual option works.", function (this: TestCase, c) {
-        this.check(UArray.eq(c.array1, ["1", "2", "3"], { useStrictEqual: false }));
+        this.check(UArray.eq(c.array1!, ["1", "2", "3"], { useStrictEqual: false }));
     });
     this.appendCase("useStrictEqual option works with AlmostArray.", function (this: TestCase, c) {
-        this.check(UArray.eq(c.aa, [1, 2, 3, 4, 5], { useStrictEqual: false }));
+        this.check(UArray.eq(c.aa!, [1, 2, 3, 4, 5], { useStrictEqual: false }));
     });
     this.appendCase("sort option works as false.", function (this: TestCase, c) {
-        this.check(!UArray.eq(c.array1, c.array2, { sort: false }));
+        this.check(!UArray.eq(c.array1!, c.array2!, { sort: false }));
     });
 });
 mt.appendUnit("randomPick", function (this: TestUnit<{
@@ -119,29 +119,29 @@ mt.appendUnit("randomPick", function (this: TestUnit<{
     before: number
 }>) {
     this.chainContextGen(_ => ({ array: int2array(10) }));
-    this.chainContextGen(c => ({ before: c.array!.length }));
+    this.chainContextGen(c => ({ before: c.array!!.length }));
     this.appendCase("takeout option works as false.", function (this: TestCase, c) {
-        const res = UArray.randomPick(c.array, { takeout: false });
-        this.check(c.array.length === c.before && !UType.isArray(res));
+        const res = UArray.randomPick(c.array!, { takeout: false });
+        this.check(c.array!.length === c.before && !UType.isArray(res));
     });
     this.appendCase("picked element is removed from an array.", function (this: TestCase, c) {
-        UArray.randomPick(c.array);
-        this.check(c.array.length < c.before);
+        UArray.randomPick(c.array!);
+        this.check(c.array!.length < c.before!);
     });
     this.appendCase("check randomization.", function (this: TestCase, c) {
-        const manyTimes = int2array(100).map(_ => UArray.randomPick(c.array, { takeout: false }));
+        const manyTimes = int2array(100).map(_ => UArray.randomPick(c.array!, { takeout: false }));
         this.check(UArray.distinct(manyTimes).length > 1);
     });
     this.appendCase("count option works correctly.", function (this: TestCase, c) {
-        const res = UArray.randomPick(c.array, { count: 2 });
+        const res = UArray.randomPick(c.array!, { count: 2 });
         this.check(UType.isArray(res, Type.number) && res.length === 2);
     });
     this.appendCase("allowDup option works correctly.", function (this: TestCase, c) {
-        const res = UArray.randomPick(c.array, { count: 11, allowDup: true });
+        const res = UArray.randomPick(c.array!, { count: 11, allowDup: true });
         this.check(UArray.duplicate(res).length > 0);
     });
     this.appendCase("the result doesn't contain duplication of elements.", function (this: TestCase, c) {
-        const res = UArray.randomPick(c.array, { count: 10 });
+        const res = UArray.randomPick(c.array!, { count: 10 });
         this.check(UArray.duplicate(res).length === 0);
     });
 });
@@ -150,16 +150,16 @@ mt.appendUnit("shuffle", function (this: TestUnit<{
     ret: number[]
 }>) {
     this.chainContextGen(_ => ({ array: int2array(10000) }));
-    this.chainContextGen(c => ({ ret: UArray.shuffle(c.array!) }));
+    this.chainContextGen(c => ({ ret: UArray.shuffle(c.array!!) }));
     this.appendCase("elements is not mutated.", function (this: TestCase, c) {
-        this.check(UArray.eq(c.array, int2array(c.array.length), { sort: false }))
+        this.check(UArray.eq(c.array!, int2array(c.array!.length), { sort: false }))
     });
     this.appendCase("basic functionality", function (this: TestCase, c) {
-        this.check(!UArray.eq(c.ret, c.array, { sort: false }));
+        this.check(!UArray.eq(c.ret!, c.array!, { sort: false }));
     });
     this.clearContextGen();
     this.chainContextGen(_ => ({ array: int2array(1) }));
-    this.chainContextGen(c => ({ ret: UArray.shuffle(c.array!) }));
+    this.chainContextGen(c => ({ ret: UArray.shuffle(c.array!!) }));
     this.appendCase("returns array type even if the array length is less than one.", function (this: TestCase, c) {
         this.check(UType.isArray(c.ret, Type.number));
     });

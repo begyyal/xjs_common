@@ -1,6 +1,6 @@
 {
   "name": "xjs-common",
-  "version": "14.3.3",
+  "version": "14.4.0",
   "description": "library modules for typescript that bundle general-purpose implementations.",
   "repository": {
     "type": "git",
@@ -43,6 +43,6 @@
     "@types/node": "^26.1.0",
     "tsx": "^4.20.3",
     "typescript": "^7.0.2",
-    "xjs-test": "^1.1.0"
+    "xjs-test": "^1.1.2"
   }
 }
