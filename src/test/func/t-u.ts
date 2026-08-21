@@ -75,7 +75,7 @@ mt.appendUnit("retry", function (this: TestUnit<{
                 return e === 1;
             }, logger: s_emptyLogger, count: 2
         }).catch(() => { });
-        // set 50 msec as time error...
+        // set 50 msec as trelance of time error...
         this.check(c.array![1] - c.array![0] < 550, () => c.array![1] - c.array![0]);
         this.check(c.array![2] - c.array![1] >= 550, () => c.array![2] - c.array![1]);
     }, { concurrent: true });
@@ -87,7 +87,8 @@ mt.appendUnit("retry", function (this: TestUnit<{
                 return e === 1;
             }, logger: s_emptyLogger, count: 2
         }).catch(() => { });
-        this.check(c.array![2] - c.array![0] > 1_000, () => c.array![2] - c.array![0]);
+        // set 50 msec as trelance of time error...
+        this.check(c.array![2] - c.array![0] > 950, () => c.array![2] - c.array![0]);
     }, { concurrent: true });
 }, { concurrent: true });
 mt.appendUnit("toMsec", function (this: TestUnit) {
