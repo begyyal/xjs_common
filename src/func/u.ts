@@ -2,7 +2,6 @@ import { TimeUnit } from "../const/time-unit";
 import { Loggable, MaybePromise } from "../const/types";
 import { XjsErrCode } from "../const/xjs-err-code";
 import { XjsErr } from "../obj/xjs-err";
-import { UType } from "./u-type";
 
 export function delay(sec: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, 1000 * sec));
@@ -12,7 +11,7 @@ export function int2array(size: number): number[] {
     if (Number.isNaN(s)) throw new XjsErr(XjsErrCode.U, "size of the argument is not number.");
     return Array.from(Array(s).keys());
 }
-export interface RetryOption<T, HT = MaybePromise<boolean>> {
+export interface RetryOption<T = any, HT = MaybePromise<boolean>> {
     /**
      * number of retries. default is 1.
      */
@@ -27,8 +26,8 @@ export interface RetryOption<T, HT = MaybePromise<boolean>> {
      */
     resultHandler?: (result?: T, exception?: any) => HT;
 };
-export interface SyncRetryOption<T> extends RetryOption<T, boolean> { };
-export interface AsyncRetryOption<T> extends RetryOption<T> {
+export interface SyncRetryOption<T = any> extends RetryOption<T, boolean> { };
+export interface AsyncRetryOption<T = any> extends RetryOption<T> {
     /**
      * seconds to wait between callbacks. this wait occurs after `resultHandler`.
      */
