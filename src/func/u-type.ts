@@ -2,10 +2,10 @@ import { Ctor, MaybeArray, Type } from "../const/types";
 import { smbl_tm, TypeMap, DType, TypeDesc } from "./decorator/d-type";
 
 export namespace UType {
-    export function isDefined(v: any): boolean {
+    export function isDefined(v: any): v is Exclude<any, undefined> {
         return typeof v !== Type.undefined;
     }
-    export function isEmpty(v: any): boolean {
+    export function isEmpty(v: any): v is (null | undefined) {
         return v === null || typeof v === Type.undefined;
     }
     export function isString(v: any): v is string { return typeof v === Type.string; }
