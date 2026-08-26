@@ -1,4 +1,5 @@
 import { IndexSignature, MaybeArray } from "../const/types";
+import { UArray } from "./u-array";
 import { UType } from "./u-type";
 
 export namespace Array2 {
@@ -20,6 +21,12 @@ export namespace Array2 {
             else map.set(k, _acm ? [e] : e);
         }
         return map;
+    }
+    /** inverts keys and values for all entries in a `Map`. */
+    export function invertMap<K, V>(map: Map<K, V>, op?: { takeFirst?: boolean }): Map<V, K> {
+        let entries = Array.from(map, ([k, v]) => [v, k] as [V, K]);
+        if (op?.takeFirst) entries = UArray.distinct(entries, { k: 0 });
+        return new Map(entries);
     }
     /**
      * generates a record object from an array and mapping functions.

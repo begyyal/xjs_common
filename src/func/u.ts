@@ -25,14 +25,14 @@ export interface RetryOption<T = any, HT = MaybePromise<boolean>> {
      * this callback returns a boolean signifies whether retry is required.
      */
     resultHandler?: (result?: T, exception?: any) => HT;
-};
-export interface SyncRetryOption<T = any> extends RetryOption<T, boolean> { };
+}
+export interface SyncRetryOption<T = any> extends RetryOption<T, boolean> { }
 export interface AsyncRetryOption<T = any> extends RetryOption<T> {
     /**
      * seconds to wait between callbacks. this wait occurs after `resultHandler`.
      */
     intervalSec?: number;
-};
+}
 /**
  * runs callback with customizable retry.
  * @param cb callback to be retried.
