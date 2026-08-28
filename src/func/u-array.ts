@@ -99,7 +99,7 @@ export namespace UArray {
             throw new XjsErr(XjsErrCode.UArray, "despite allowDup is false, length of the array is less than count.");
         const array = takeout ? arg_array : [...arg_array];
         if (count === 1) return array.splice(Math.floor(array.length * Math.random()), 1)[0];
-        let indexes = int2array(count)
+        const indexes = int2array(count)
             .map(i => Math.floor((allowDup ? array.length : array.length - i) * Math.random()));
         if (allowDup) {
             const ret = indexes.map(i => array[i]);

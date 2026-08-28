@@ -29,5 +29,11 @@ mt.appendUnit("valueof", function (this: TestUnit) {
     this.appendCase("exclude a value the enum doesm't contain.", function (this: TestCase) {
         this.check(UEnum.valueof(EnumA, 1) === undefined);
     });
+    this.appendCase("loose equality is taken as default.", function (this: TestCase) {
+        this.check(UEnum.valueof(EnumB, "1") === 1);
+    });
+    this.appendCase("op.strictEquality works correctly.", function (this: TestCase) {
+        this.check(UEnum.valueof(EnumB, "1", { strictEquality: true }) === undefined);
+    });
 });
 export const T_UEnum = mt;
