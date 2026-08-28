@@ -84,5 +84,13 @@ mt.appendUnit("hall", function (this: TestUnit) {
         this.expectError();
         await hall.awaitAudience({ count: 2, timeoutMsec: 1_000 });
     }), { concurrent: true };
+    this.appendCase("can set void as contents of speak.", async function (this: TestCase) {
+        const hall = new Hall();
+        let count = 0;
+        hall.attend(() => count++);
+        hall.attend(() => count++);
+        await hall.speak();
+        this.check(count === 2);
+    }), { concurrent: true };
 });
 export const T_Hall = mt;

@@ -9,7 +9,7 @@ import { XjsErr } from "./xjs-err";
  * facilitates data transfer across asynchronous tasks.  
  * imagine someone speaks to audiences in the "Hall".
  */
-export class Hall<T> {
+export class Hall<T = void> {
     private readonly _listener: { id: number, cb: (d: T) => MaybePromise<any>, queues: [number, T][] }[] = [];
     private readonly _cleaners: (() => MaybePromise<any>)[] = [];
     private readonly _takingNotesMsec: number;
