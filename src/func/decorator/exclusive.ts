@@ -10,14 +10,15 @@ import { toMsec, waitFor } from "../u";
  */
 export function exclusive(op?: { timeoutSec?: number, semaphore?: number }) {
     let _smp = op?.semaphore ?? 1;
-    const waitForOp = {
-        timeoutMsec: toMsec(op?.timeoutSec ?? 30, TimeUnit.Sec),
-        thrownIfTimeout: () => new XjsErr(XjsErrCode.Exclusive, "An exclusive process to execute was already running by other request.")
-    };
+    const waitForOp = { timeoutMsec: toMsec(op?.timeoutSec ?? 30, TimeUnit.Sec) };
     return (_target: any, _propertyKey: string, descriptor: PropertyDescriptor) => {
         const method = descriptor.value!;
         async function exe(this: any, ...p: any) {
-            if (_smp <= 0) await waitFor(() => _smp > 0, waitForOp);
+            if (_smp <= 0) await waitFor(() => _smp > 0, waitForOp).catch(e => {
+                if (e instanceof XjsErr && e.code === XjsErrCode.U)
+                    throw new XjsErr(XjsErrCode.Exclusive, "an exclusive process to execute was already running by other request.");
+                else throw e;
+            });
             try {
                 _smp--;
                 const ret = method.apply(this, p);
