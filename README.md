@@ -1,20 +1,20 @@
 [![npm][npm-badge]][npm-url] [![CI][ci-badge]][ci-url] [![publish][publish-badge]][publish-url]
 
 # Overview
-Library modules for typescript that bundle general-purpose implementations.  
-This module is very simple, therefore it has no dependencies.
+library modules for typescript that bundle general-purpose implementations.  
+this package is very simple, therefore it has no dependencies.
 
 # Install
 ```
 npm i xjs-common
 ```
-**NOTE**: features related nodejs was moved to [xjs-node](https://github.com/begyyal/xjs_node) at v10.0.0.  
+**NOTE**: features related nodejs were moved to [xjs-node](https://github.com/begyyal/xjs_node) at v10.0.0.  
 if you has been used the features (e.g. `HttpResolver`, `UFile`), please use the new package instead of this.
 
 # Code example (only part)
 ### Miscellaneous utilities.
 ```ts
-import { delay, waitFor, int2array, UHttp, retry, MaybeArray, Loggable, valueof } from "xjs-common";
+import { delay, waitFor, int2array, retry, MaybeArray, Loggable, valueof } from "xjs-common";
 
 (async () => {
     // await 3 seconds.
