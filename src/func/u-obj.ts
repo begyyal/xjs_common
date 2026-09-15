@@ -94,4 +94,12 @@ export namespace UObj {
         rec(o);
         return o;
     }
+    /** inverts object entries. only an object whose values can be index signature is eligible. */
+    export function invertEntries<T extends NormalRecord<V>, V extends IndexSignature>(o: T): Record<V, keyof T> {
+        return Object.keys(o).reduce((no, k) => {
+            const m = k.match(/^\d+(\.\d+)?$/);
+            no[o[k]] = m ? Number(m[0]) : k;
+            return no;
+        }, {} as Record<V, keyof T>);
+    }
 }

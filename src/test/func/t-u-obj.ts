@@ -5,6 +5,7 @@ import { UObj } from "../../func/u-obj";
 import { genCLS_A, genCLS_B, genIF_A, genIF_B } from "../sample/func/u";
 import { CLS_A, CLS_B, CLS_C } from "../sample/obj/class-common";
 import { IF_A, IF_B, IF_C } from "../sample/obj/if-common";
+import { UType } from "../../func/u-type";
 
 const mt = new ModuleTest("T_UObj");
 mt.appendUnit("assignProperties", function (this: TestUnit<{
@@ -137,6 +138,16 @@ mt.appendUnit("truncate", function (this: TestUnit) {
     this.appendCase("truncate an object with a schema.", function (this: TestCase) {
         const obj = { id: null, a: 2, b: null };
         this.check(UArray.eq(Object.keys(UObj.truncate(obj, CLS_A)), ["id", "a"]));
+    });
+});
+mt.appendUnit("invertEntries", function (this: TestUnit) {
+    this.appendCase("basic functionality", function (this: TestCase) {
+        const o = { a: 1, b: 2, 3: "c" };
+        this.check(JSON.stringify({ 1: "a", 2: "b", "c": 3 }) === JSON.stringify(UObj.invertEntries(o)));
+    });
+    this.appendCase("numeric keys are transformed into numbers.", function (this: TestCase) {
+        const o = { 1: "a", 1.2: "b" };
+        this.check(Object.values(UObj.invertEntries(o)).every(v => UType.isNumber(v)));
     });
 });
 export const T_UObj = mt;
