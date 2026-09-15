@@ -142,12 +142,18 @@ mt.appendUnit("truncate", function (this: TestUnit) {
 });
 mt.appendUnit("invertEntries", function (this: TestUnit) {
     this.appendCase("basic functionality", function (this: TestCase) {
-        const o = { a: 1, b: 2, 3: "c" };
-        this.check(JSON.stringify({ 1: "a", 2: "b", "c": 3 }) === JSON.stringify(UObj.invertEntries(o)));
+        const o = { a: 1, b: 2, 3: "c", 4: "", 5: " " };
+        const inverted = JSON.stringify(UObj.invertEntries(o));
+        this.check(JSON.stringify({ 1: "a", 2: "b", "c": 3, "": 4, " ": 5 }) === inverted);
     });
     this.appendCase("numeric keys are transformed into numbers.", function (this: TestCase) {
         const o = { 1: "a", 1.2: "b" };
         this.check(Object.values(UObj.invertEntries(o)).every(v => UType.isNumber(v)));
+    });
+    this.appendCase("empty values will be lost.", function (this: TestCase) {
+        const o = { 1: "a", 1.2: null, "b": undefined } as any;
+        const inverted = Object.entries(UObj.invertEntries(o));
+        this.check(inverted.length === 1 && UArray.eq(inverted[0], ["a", 1]));
     });
 });
 export const T_UObj = mt;

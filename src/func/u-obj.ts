@@ -94,9 +94,13 @@ export namespace UObj {
         rec(o);
         return o;
     }
-    /** inverts object entries. only an object whose values can be index signature is eligible. */
+    /** 
+     * inverts object entries. only an object whose values can be index signature is eligible. \
+     * if empty values (`null` or `undefined`) are included in the values of an original object, these entries are ignored.
+     */
     export function invertEntries<T extends NormalRecord<V>, V extends IndexSignature>(o: T): Record<V, keyof T> {
         return Object.keys(o).reduce((no, k) => {
+            if (UType.isEmpty(o[k])) return no;
             const m = k.match(/^\d+(\.\d+)?$/);
             no[o[k]] = m ? Number(m[0]) : k;
             return no;
