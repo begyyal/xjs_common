@@ -142,13 +142,14 @@ mt.appendUnit("truncate", function (this: TestUnit) {
 });
 mt.appendUnit("invertEntries", function (this: TestUnit) {
     this.appendCase("basic functionality", function (this: TestCase) {
-        const o = { a: 1, b: 2, 3: "c", 4: "", 5: " " };
-        const inverted = JSON.stringify(UObj.invertEntries(o));
-        this.check(JSON.stringify({ 1: "a", 2: "b", "c": "3", "": "4", " ": "5" }) === inverted);
+        const o = { a: 1, b: 2, 3: "c", "4": "", 5: " " };
+        const inverted = UObj.invertEntries(o); // check that types are correct.
+        this.check(JSON.stringify({ 1: "a", 2: "b", "c": "3", "": "4", " ": "5" }) === JSON.stringify(inverted));
     });
-    this.appendCase("numeric keys are transformed into numbers if numConv is true.", function (this: TestCase) {
-        const o = { 1: "a", 1.2: "b" };
-        this.check(Object.values(UObj.invertEntries(o, { numConv: true })).every(v => UType.isNumber(v)));
+    this.appendCase("numeric keys are transformed into numbers if toNum is true.", function (this: TestCase) {
+        const o = { "1": "a", 1.2: "b" };
+        const inverted = UObj.invertEntries(o, { numConv: true }); // check that types are correct.
+        this.check(Object.values(inverted).every(v => UType.isNumber(v)));
     });
     this.appendCase("empty values will be lost.", function (this: TestCase) {
         const o = { 1: "a", 1.2: null, "b": undefined } as any;
