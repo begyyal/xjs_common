@@ -97,12 +97,16 @@ export namespace UObj {
     /** 
      * inverts object entries. only an object whose values can be index signature is eligible. \
      * if empty values (`null` or `undefined`) are included in the values of an original object, these entries are ignored.
+     * @param o an object to be inverted.
+     * @param op.numConv if true, numeric keys (including numeric string) are inverted to values with converting to type of number. default is false.
      */
-    export function invertEntries<T extends NormalRecord<V>, V extends IndexSignature>(o: T): Record<V, keyof T> {
+    export function invertEntries<T extends NormalRecord<V>, V extends IndexSignature>(o: T, op?: { numConv?: boolean }): Record<V, keyof T> {
         return Object.keys(o).reduce((no, k) => {
             if (UType.isEmpty(o[k])) return no;
-            const m = k.match(/^\d+(\.\d+)?$/);
-            no[o[k]] = m ? Number(m[0]) : k;
+            if (op?.numConv) {
+                const m = k.match(/^\d+(\.\d+)?$/);
+                no[o[k]] = m ? Number(m[0]) : k;
+            } else no[o[k]] = k;
             return no;
         }, {} as Record<V, keyof T>);
     }
