@@ -14,7 +14,7 @@ if you has been used the features (e.g. `HttpResolver`, `UFile`), please use the
 # Code example (only part)
 ### Miscellaneous utilities.
 ```ts
-import { delay, waitFor, int2array, retry, MaybeArray, Loggable, valueof } from "xjs-common";
+import { delay, waitFor, int2array, retry, MaybeArray, Loggable, Ctor, UEnum, RecursiveKey } from "xjs-common";
 
 (async () => {
     // await 3 seconds.
@@ -31,6 +31,8 @@ import { delay, waitFor, int2array, retry, MaybeArray, Loggable, valueof } from 
     let dateCtor: Ctor = Date; // constructor type like class type.
     let maybeArray: MaybeArray<number> = 0; // also number array is applicable.
     let logger: Loggable = console; // object implements log/warn/error is applicable.
+    interface ObjA { a: number, b?: { c: string }[], d: { e?: { f: string } } }
+    let recursiveKey: RecursiveKey<ObjA>; // equivalent to ["a" | "b" | "d" | "b.c" | "d.e" | "d.e.f"]
 
     enum EnumA { A = 1, B = "b", C = "3" }
     console.log(UEnum.values(EnumA)); // [1, "b", "3"]

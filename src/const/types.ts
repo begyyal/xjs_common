@@ -1,6 +1,14 @@
 
 export type Ctor<T = any> = { new(): T };
 export type IndexSignature = string | number | symbol;
+/** accepts hierarchical properties notation combined with dot. */
+export type RecursiveKey<T extends object> = {
+    [k in keyof T & (string | number)]: NonNullable<T[k]> extends any[]
+    ? `${k}` | `${k}.${RecursiveKey<NonNullable<T[k]>[number]>}`
+    : NonNullable<T[k]> extends object
+    ? `${k}` | `${k}.${RecursiveKey<NonNullable<T[k]>>}`
+    : `${k}`;
+}[keyof T & (string | number)];
 export type NormalRecord<T = any> = Record<IndexSignature, T>;
 export type MaybeArray<T = any> = T | T[];
 export type MaybePromise<T = any> = T | Promise<T>;
