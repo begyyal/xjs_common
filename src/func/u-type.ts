@@ -1,4 +1,4 @@
-import { Ctor, MaybeArray, Type } from "../const/types";
+import { Ctor, MaybeArray, RecursiveKey, Type } from "../const/types";
 import { smbl_tm, TypeMap, DType, TypeDesc } from "./decorator/d-type";
 
 export namespace UType {
@@ -29,25 +29,26 @@ export namespace UType {
     /** 
      * validates properties decorated with {@link DType}.
      * @param o an object to be validated. if this is a class object decorated with {@link DType}, it can omits `ctor` parameter.
-     * @param ctor a class constructor type whose properties are decorated. **NOTE** that need to have public constructor without any parameter.
-     * @param exclude property keys which are excluded in the validation.
-     * @returns invalid property keys. returns an empty array if `o` is valid.
+     * @param ctor a class constructor type whose properties are decorated. **NOTE**: it needs to have public constructor without any parameter.
+     * @param exclude property keys which are excluded in the validation. {@link RecursiveKey|dot combined notation} is available for specifying nested properties.
+     * @returns invalid property keys combined with dot. returns an empty array if `o` is valid.
      */
-    export function validate<T extends Exclude<{}, Ctor>>(o: any, ctor?: Ctor<T>, exclude?: (keyof T)[]): string[] {
+    export function validate<T extends Exclude<{}, Ctor>>(o: any, ctor?: Ctor<T>, exclude?: RecursiveKey<T>[]): string[] {
         const _o = (!ctor || o instanceof ctor) ? o : Object.assign(new ctor(), o);
-        const _exlude = (exclude ?? []).map(k => k?.toString());
         if (!_o[smbl_tm]) return [];
-        return Object.entries(_o[smbl_tm] as TypeMap).filter(e => !_exlude.includes(e[0])).flatMap(e => validateProp(e[0], _o[e[0]], e[1]));
+        return Object.entries(_o[smbl_tm] as TypeMap).flatMap(e => validateProp(e[0], _o[e[0]], e[1], exclude));
     }
-    function validateProp(k: string, prop: any, td: TypeDesc): string[] {
+    function validateProp(k: string, prop: any, td: TypeDesc, exclude?: string[]): string[] {
+        if (exclude?.includes(k)) return [];
         if (isEmpty(prop)) return td.req ? [k] : [];
         if (td.t && typeof prop !== td.t) return [k];
         const joinKey = (k2: string) => `${k}.${k2}`;
+        const exclude4k = exclude && exclude.filter(ek => ek.startsWith(k + ".")).map(ek => ek.substring(k.length + 1));
         if (td.ary) return Array.isArray(prop)
-            ? prop.flatMap((e, i) => validateProp(i.toString(), e, td.ary!)).map(joinKey) : [k];
+            ? prop.flatMap((e, i) => validateProp(i.toString(), e, td.ary!, exclude4k)).map(joinKey) : [k];
         if (td.rcd) return UType.isObject(prop)
-            ? Object.entries(prop).flatMap(e => validateProp(e[0], e[1], td.rcd!)).map(joinKey) : [k];
-        if (td.cls) return validate(prop, td.cls).flatMap(joinKey);
+            ? Object.entries(prop).flatMap(e => validateProp(e[0], e[1], td.rcd!, exclude4k)).map(joinKey) : [k];
+        if (td.cls) return validate(prop, td.cls, exclude4k).flatMap(joinKey);
         return [];
     }
     export function takeAsArray<T>(v: MaybeArray<T>): T[] {

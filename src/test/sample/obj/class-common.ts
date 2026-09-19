@@ -77,4 +77,18 @@ export class CLS_C extends CLS_Base implements IF_C {
         this.ary = ary;
     }
 }
+export class CLS_D extends CLS_Base {
+    @DType.required
+    @DType.number
+    id?: number;
+    @DType.object(CLS_C)
+    cls_c?: CLS_C;
+    constructor(
+        id?: number,
+        cls_c?: CLS_C) {
+        super();
+        this.id = id;
+        this.cls_c = cls_c;
+    }
+}
 export class CLS_X { }

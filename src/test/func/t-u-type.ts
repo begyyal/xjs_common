@@ -2,9 +2,10 @@ import { ModuleTest, TestCase, TestUnit } from "xjs-test";
 import { Type } from "../../const/types";
 import { UArray } from "../../func/u-array";
 import { UType } from "../../func/u-type";
-import { CLS_A, CLS_B, CLS_C } from "../sample/obj/class-common";
+import { CLS_A, CLS_B, CLS_C, CLS_D } from "../sample/obj/class-common";
 import { IF_C } from "../sample/obj/if-common";
 
+interface ObjA { a: number, b?: { c: string }[], d: { e?: { f: string } } }
 const mt = new ModuleTest("T_UType");
 mt.appendUnit("isEmpty", function (this: TestUnit) {
     this.appendCase("basic functionality", function (this: TestCase) {
@@ -93,7 +94,8 @@ mt.appendUnit("validate", function (this: TestUnit<{
         this.check(UType.validate(o2, CLS_C).length === 0);
     });
     this.appendCase("exlude option works correctly.", function (this: TestCase) {
-        this.check(UType.validate({}, CLS_A, ["id"]).length === 0);
+        const invalid = UType.validate({ cls_c: { cls: 1 } }, CLS_D, ["id", "cls_c.cls"]);
+        this.check(invalid.length === 0, () => invalid);
     });
 });
 mt.appendUnit("isArray", function (this: TestUnit<{
