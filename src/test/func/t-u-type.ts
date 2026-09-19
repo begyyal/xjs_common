@@ -92,6 +92,9 @@ mt.appendUnit("validate", function (this: TestUnit<{
         const o2: IF_C = { cls: { id: 1 }, rcd: { a: { id: 1 } }, ary: [{ id: 1 }] };
         this.check(UType.validate(o2, CLS_C).length === 0);
     });
+    this.appendCase("exlude option works correctly.", function (this: TestCase) {
+        this.check(UType.validate({}, CLS_A, ["id"]).length === 0);
+    });
 });
 mt.appendUnit("isArray", function (this: TestUnit<{
     array: (number | string)[]

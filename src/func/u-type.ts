@@ -28,14 +28,16 @@ export namespace UType {
     }
     /** 
      * validates properties decorated with {@link DType}.
-     * @param o object to be validated. if this is class object decorated with {@link DType}, it can omits `ctor` parameter.
-     * @param ctor class constructor type whose properties are decorated. **NOTE** that need to have public constructor without any parameter.
+     * @param o an object to be validated. if this is a class object decorated with {@link DType}, it can omits `ctor` parameter.
+     * @param ctor a class constructor type whose properties are decorated. **NOTE** that need to have public constructor without any parameter.
+     * @param exclude property keys which are excluded in the validation.
      * @returns invalid property keys. returns an empty array if `o` is valid.
      */
-    export function validate(o: any, ctor?: Ctor): string[] {
+    export function validate<T extends Exclude<{}, Ctor>>(o: any, ctor?: Ctor<T>, exclude?: (keyof T)[]): string[] {
         const _o = (!ctor || o instanceof ctor) ? o : Object.assign(new ctor(), o);
+        const _exlude = (exclude ?? []).map(k => k?.toString());
         if (!_o[smbl_tm]) return [];
-        return Object.entries(_o[smbl_tm] as TypeMap).flatMap(e => validateProp(e[0], _o[e[0]], e[1]));
+        return Object.entries(_o[smbl_tm] as TypeMap).filter(e => !_exlude.includes(e[0])).flatMap(e => validateProp(e[0], _o[e[0]], e[1]));
     }
     function validateProp(k: string, prop: any, td: TypeDesc): string[] {
         if (isEmpty(prop)) return td.req ? [k] : [];
