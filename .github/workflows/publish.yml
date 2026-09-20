@@ -6,8 +6,18 @@ on:
         description: 'package version.'
         required: true
         type: string
+      job2run:
+        description: 'job to run.'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - publish
+          - notify
 jobs:
   publish:
+    if: ${{ inputs.job2run == 'all' || inputs.job2run == 'publish' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -32,9 +42,11 @@ jobs:
     - name: Publish
       run: npm publish --provenance --access public --tag ${{ github.ref_name == 'main' && 'latest' || 'alpha' }}
   notify:
+    if: ${{ always() && (inputs.job2run == 'all' && needs.build.result == 'success' || inputs.job2run == 'notify') }}
     runs-on: ubuntu-latest
     needs: publish
     steps:
+    - uses: actions/checkout@v4
     - name: Post tweet
       run: |
         ./tool/tweet_template.sh \
