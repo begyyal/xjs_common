@@ -1,5 +1,5 @@
 import { ModuleTest, TestCase, TestUnit } from "xjs-test";
-import { Type } from "../../const/types";
+import { RecursiveKey, Type } from "../../const/types";
 import { UArray } from "../../func/u-array";
 import { UType } from "../../func/u-type";
 import { CLS_A, CLS_B, CLS_C, CLS_D } from "../sample/obj/class-common";
@@ -94,7 +94,8 @@ mt.appendUnit("validate", function (this: TestUnit<{
         this.check(UType.validate(o2, CLS_C).length === 0);
     });
     this.appendCase("exlude option works correctly.", function (this: TestCase) {
-        const invalid = UType.validate({ cls_c: { cls: 1 } }, CLS_D, ["id", "cls_c.cls"]);
+        const keys: RecursiveKey<CLS_D>[] = ["id", "cls_c.cls"]; // check if "excessive stack depth" error occurs.
+        const invalid = UType.validate({ cls_c: { cls: 1 } }, CLS_D, keys);
         this.check(invalid.length === 0, () => invalid);
     });
 });
