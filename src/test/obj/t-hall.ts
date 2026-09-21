@@ -92,5 +92,14 @@ mt.appendUnit("hall", function (this: TestUnit) {
         await hall.speak();
         this.check(count === 2);
     }), { concurrent: true };
+    this.appendCase("clear current statement at breaking up.", async function (this: TestCase) {
+        const hall = new Hall();
+        let count = 0;
+        hall.speak();
+        hall.attend(() => count++);
+        hall.breakUp();
+        hall.attend(() => count++);
+        this.check(count === 1);
+    }), { concurrent: true };
 });
 export const T_Hall = mt;

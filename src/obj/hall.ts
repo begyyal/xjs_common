@@ -70,13 +70,16 @@ export class Hall<T = void> {
      * @param seatNum audience id returned from {@link attend()}.
      */
     leave(seatNum: number): void {
-        UArray.takeOut(this._listener, l => l.id === seatNum);
+        const leaved = UArray.takeOut(this._listener, l => l.id === seatNum)[0];
+        if (leaved) leaved.queues.splice(0);
     }
     /**
      * breaks up audiences with cleaning.
      * @returns promise that resolves when all audiences digest what speak so far and complete cleaning.
      */
     async breakUp(): Promise<void> {
+        this._qidTop = 0;
+        this.currentStatement = undefined;
         await Promise.all(this._listener.map(r => waitFor(() => r.queues.length === 0, {
             timeoutMsec: this._takingNotesMsec
         }).catch(e => {
