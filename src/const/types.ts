@@ -1,21 +1,21 @@
-import { int2array } from "../func/u";
 
 export type Ctor<T = any> = { new(): T };
 export type IndexSignature = string | number | symbol;
+/** includes first, excludes last. */
 export type NumericRange<S extends number, E extends number, A extends number[] = [], R extends number = never> =
     A["length"] extends E
     ? S | R
     : NumericRange<S, E, [...A, 1], A[S] extends undefined ? never : R | A["length"]>;
 type depthMap = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 /** 
- * accepts hierarchical properties notation combined with dot. \
+ * accepts hierarchical properties notation combined with a delimiter (default is dot). \
  * for suppressing an error due to infinite type evaluation, count of hierarchy is limited under `9`. default is `5`.
  */
-export type RecursiveKey<T extends object, D extends NumericRange<0, 10> = 5> = D extends never ? never : {
+export type RecursiveKey<T extends object, DP extends NumericRange<0, 10> = 5, DL extends string = "."> = DP extends never ? never : {
     [k in keyof T & (string | number)]: NonNullable<T[k]> extends any[]
-    ? `${k}` | `${k}.${RecursiveKey<NonNullable<T[k]>[number], depthMap[D]>}`
+    ? `${k}` | `${k}${DL}${RecursiveKey<NonNullable<T[k]>[number], depthMap[DP], DL>}`
     : NonNullable<T[k]> extends object
-    ? `${k}` | `${k}.${RecursiveKey<NonNullable<T[k]>, depthMap[D]>}`
+    ? `${k}` | `${k}${DL}${RecursiveKey<NonNullable<T[k]>, depthMap[DP], DL>}`
     : `${k}`;
 }[keyof T & (string | number)];
 export type NormalRecord<T = any> = Record<IndexSignature, T>;
