@@ -1,4 +1,5 @@
-import { Ctor, IndexSignature, MaybeArray, NormalRecord, Type } from "../const/types";
+import { Ctor, IndexSignature, MaybeArray, NormalRecord, NumericRange, RecursiveKey, Type } from "../const/types";
+import { Tree, TreeRoot } from "../obj/tree";
 import { DType, smbl_tm, TypeMap } from "./decorator/d-type";
 import { UType } from "./u-type";
 
@@ -7,16 +8,39 @@ export namespace UObj {
      * assigns properties to the object with specified property keys.
      * @param t target object.
      * @param s source object.
-     * @param keys property keys which are copied from source object. if omit this, all keys in source object is applied.
-     * @param keepDtypeClass if true, class which has properties decorated with {@link DType} in target object is kept and that is assigned properties recursively.
+     * @param op.keys property keys which are copied from the source object. if omit this, all keys in the source object are applied.
+     * @param op.keepDtypeClass if true, classes which have properties decorated with {@link DType} in the target object are kept and it's assigned properties recursively.
+     * @param op.recKeyDelim a delimiter of {@link RecursiveKey|recursive keys}. default is dot, so you have to set a value if any of the key contain dot.
      */
-    export function assignProperties<T extends NormalRecord, S extends NormalRecord>(
-        t: T, s: S, keys?: (keyof S)[], keepDtypeClass?: boolean): T & Partial<S> {
-        for (const k of keys ?? Object.keys(s)) if (UType.isDefined(s[k]))
-            if (keepDtypeClass && UType.isObject(t[k]) && UType.isObject(s[k]) && t[k]?.[smbl_tm]) {
-                assignProperties(t[k], s[k], undefined, true);
-            } else t[k] = s[k];
+    export function assignProperties<
+        T extends NormalRecord,
+        S extends NormalRecord,
+        DP extends NumericRange<0, 10> = 5,
+        DL extends string = ".">(
+            t: T, s: S, op?: { keys?: RecursiveKey<S, DP, NoInfer<DL>>[], keepDtypeClass?: boolean, recKeyDelim?: DL }): T & Partial<S> {
+        const keepDtypeClass = !!op?.keepDtypeClass, keys = op?.keys, delim = op?.recKeyDelim ?? ".";
+        if (keys?.some(k => k.includes(delim))) {
+            const tree = TreeRoot.bundle(keys as string[], m => {
+                const nodes = m.split(delim);
+                return { node: nodes.shift()!, child: nodes.length > 0 ? nodes.join(delim) : undefined };
+            });
+            assignProperties4rec(t, s, tree, keepDtypeClass);
+        } else for (const k of Object.keys(s)) assignProperty(t, s, k, keepDtypeClass);
         return t;
+    }
+    function assignProperties4rec<T extends NormalRecord, S extends NormalRecord>(
+        t: T, s: S, tree: Tree<string, string>, keepDtypeClass?: boolean): T & Partial<S> {
+        for (const c of tree.branches) {
+            if (c.isEnd) assignProperty(t, s, c.node, keepDtypeClass);
+            else assignProperties4rec(t[c.node], s[c.node], c, keepDtypeClass);
+        }
+        return t;
+    }
+    function assignProperty<T extends NormalRecord, S extends NormalRecord>(t: T, s: S, k: keyof S, keepDtypeClass?: boolean): void {
+        if (!UType.isDefined(s[k])) return;
+        if (keepDtypeClass && UType.isObject(t[k]) && UType.isObject(s[k]) && t[k]?.[smbl_tm]) {
+            assignProperties(t[k], s[k], { keepDtypeClass });
+        } else t[k] = s[k];
     }
     /**
      * crops properties of the object other than specified. the properties are to be removed with `delete` operator.

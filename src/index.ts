@@ -17,3 +17,4 @@ export { DType } from "./func/decorator/d-type";
 
 export * from "./obj/xjs-err";
 export * from "./obj/hall";
+export * from "./obj/tree";

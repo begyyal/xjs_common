@@ -11,8 +11,8 @@ export interface IF_B {
     c: string;
     d: number;
 }
-export interface IF_C {
-    cls: any;
-    rcd: any;
-    ary: any;
+export interface IF_C<T = any> {
+    cls?: T;
+    rcd?: T;
+    ary?: T[];
 }

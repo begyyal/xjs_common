@@ -10,29 +10,35 @@ import { UType } from "../../func/u-type";
 const mt = new ModuleTest("T_UObj");
 mt.appendUnit("assignProperties", function (this: TestUnit<{
     record_a: IF_A,
-    record_b: IF_B,
-    assigned: IF_A & Partial<IF_B>
+    record_b: IF_B
 }>) {
     this.chainContextGen(_ => ({
         record_a: genIF_A(1)[0],
         record_b: genIF_B(1)[0]
     }));
-    this.chainContextGen(c => ({
-        assigned: UObj.assignProperties(c.record_a!, c.record_b!, ["b", "d"])
-    }));
     this.appendCase("basic functionality", function (this: TestCase, c) {
-        this.check(!!c.assigned!.a && !!c.assigned!.d);
+        UObj.assignProperties(c.record_a!, c.record_b!, { keys: ["b", "d"] });
+        this.check(!!c.record_a!.a && !!(c.record_a as any)["d"]);
     });
     this.appendCase("override property at the assigning.", function (this: TestCase, c) {
-        this.check(c.assigned!.b === "bbb_b");
+        UObj.assignProperties(c.record_a!, c.record_b!, { keys: ["b", "d"] });
+        this.check(c.record_a!.b === "bbb_b");
     });
     this.appendCase("keeping d-type class optipn works.", function (this: TestCase) {
         const assign4keepOption = (keep: boolean) => {
             const b = { id: 1, a: 2, b: "3", cls_b: { id: 11, d: [1], e: "bad" } };
-            return UObj.assignProperties(genCLS_A(1)[0], b, undefined, keep);
+            return UObj.assignProperties(genCLS_A(1)[0], b, { keepDtypeClass: keep });
         };
         this.check(!((assign4keepOption(false).cls_b as any) instanceof CLS_B));
         this.check((assign4keepOption(true).cls_b as any) instanceof CLS_B)
+    });
+    this.appendCase("assign nested properties by recursive keys.", function (this: TestCase, c) {
+        const c1: IF_C<IF_A> = { rcd: c.record_a }, c2 = { rcd: genIF_A(1)[0] };
+        c2.rcd.a = "x", c2.rcd.b = "xx";
+        UObj.assignProperties(c1, c2, { keys: ["rcd.a"] });
+        this.check(c1.rcd!.a === "x" && c1.rcd!.b === "bbb" && c1.rcd!.c === "ccc");
+        UObj.assignProperties(c1, c2, { keys: ["rcd-b"], recKeyDelim: "-" });
+        this.check(c1.rcd!.a === "x" && c1.rcd!.b === "xx" && c1.rcd!.c === "ccc");
     });
 });
 mt.appendUnit("crop", function (this: TestUnit<{
@@ -85,7 +91,7 @@ mt.appendUnit("crop", function (this: TestUnit<{
         const checkA = (oa: { a: number, aa: number }) => this.check(!!oa.a && !oa.aa);
         checkA(cropped.cls);
         checkA(cropped.rcd.a);
-        checkA(cropped.ary[0]);
+        checkA(cropped.ary![0]);
     });
 });
 mt.appendUnit("manipulateProperties", function (this: TestUnit<{

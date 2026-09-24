@@ -8,12 +8,14 @@ import { T_UObj } from "./func/t-u-obj";
 import { T_UString } from "./func/t-u-string";
 import { T_UType } from "./func/t-u-type";
 import { T_Hall } from "./obj/t-hall";
+import { T_Tree } from "./obj/t-tree";
 
 (async () => {
     console.time("total time");
     await Promise.all([
         T_Exclusive,
         T_Hall,
+        T_Tree,
         T_U,
         T_UArray,
         T_UObj,
