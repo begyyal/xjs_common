@@ -36,7 +36,7 @@ export class Hall<T = void> {
         await Promise.all(this._listener.map(async r => {
             r.queues.push([qid, d]);
             await waitFor(() => {
-                if (r.queues.length === 0) new XjsErr(XjsErrCode.Hall, "already broke up in this hall.");
+                if (r.queues.length === 0) throw new XjsErr(XjsErrCode.Hall, "already broke up in this hall.");
                 return r.queues[0][0] === qid;
             }, { timeoutMsec: this._takingNotesMsec }).catch(e => {
                 if (e instanceof XjsErr && e.code === 10) {
