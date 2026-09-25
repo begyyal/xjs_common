@@ -25,7 +25,7 @@ export namespace UObj {
                 return { node: nodes.shift()!, child: nodes.length > 0 ? nodes.join(delim) : undefined };
             });
             assignProperties4rec(t, s, tree, keepDtypeClass);
-        } else for (const k of Object.keys(s)) assignProperty(t, s, k, keepDtypeClass);
+        } else for (const k of keys ?? Object.keys(s)) assignProperty(t, s, k, keepDtypeClass);
         return t;
     }
     function assignProperties4rec<T extends NormalRecord, S extends NormalRecord>(

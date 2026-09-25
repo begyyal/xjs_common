@@ -22,7 +22,7 @@ mt.appendUnit("assignProperties", function (this: TestUnit<{
     });
     this.appendCase("override property at the assigning.", function (this: TestCase, c) {
         UObj.assignProperties(c.record_a!, c.record_b!, { keys: ["b", "d"] });
-        this.check(c.record_a!.b === "bbb_b");
+        this.check(c.record_a!.b === "bbb_b" && c.record_a!.c === "ccc");
     });
     this.appendCase("keeping d-type class optipn works.", function (this: TestCase) {
         const assign4keepOption = (keep: boolean) => {
