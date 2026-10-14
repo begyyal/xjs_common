@@ -5,7 +5,6 @@ import { UType } from "../../func/u-type";
 import { CLS_A, CLS_B, CLS_C, CLS_D } from "../sample/obj/class-common";
 import { IF_C } from "../sample/obj/if-common";
 
-interface ObjA { a: number, b?: { c: string }[], d: { e?: { f: string } } }
 const mt = new ModuleTest("T_UType");
 mt.appendUnit("isEmpty", function (this: TestUnit) {
     this.appendCase("basic functionality", function (this: TestCase) {

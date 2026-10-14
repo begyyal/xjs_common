@@ -101,5 +101,14 @@ mt.appendUnit("hall", function (this: TestUnit) {
         hall.attend(() => count++);
         this.check(count === 1);
     }), { concurrent: true };
+    this.appendCase("handle an exception in the cleaners.", async function (this: TestCase) {
+        const hall = new Hall({ exceptionHandler: () => { } });
+        hall.assignCleaner(() => { throw 1; });
+        hall.attend(() => { });
+        const awaitBrk = hall.awaitBreakingUp();
+        hall.breakUp();
+        const maybeHang = await Promise.race([awaitBrk, delay(1).then(() => true)]);
+        this.check(!maybeHang);
+    }), { concurrent: true };
 });
 export const T_Hall = mt;

@@ -13,6 +13,7 @@ export class Hall<T = void> {
     private readonly _listener: { id: number, cb: (d: T) => MaybePromise<any>, queues: [number, T][] }[] = [];
     private readonly _cleaners: (() => MaybePromise<any>)[] = [];
     private readonly _takingNotesMsec: number;
+    private readonly _exceptionHandler: (e: any) => void;
     private _qidTop = 0;
     private _lidTop = 0;
     /** what {@link speak()|spoke} last. */
@@ -20,9 +21,13 @@ export class Hall<T = void> {
     get isNoAudiences() { return this._listener.length === 0; }
     /**
      * @param op.takingNotesMsec queue processing timeout milliseconds. (what speak is processed sequentially each audience.) default is 30 seconds.
+     * @param op.exceptionHandler this handles every exceptions that occur within the callbacks of the hall.
      */
-    constructor(op?: { takingNotesMsec?: number }) {
+    constructor(op?: { takingNotesMsec?: number, exceptionHandler?: (e: any) => void }) {
         this._takingNotesMsec = op?.takingNotesMsec ?? toMsec(30, TimeUnit.Sec);
+        this._exceptionHandler = op?.exceptionHandler ? ((e: any) => {
+            try { op.exceptionHandler!(e); } catch (e2) { console.error("[XJS] failover in the exception handler of the hall.", e2); }
+        }) : ((e: any) => console.error(e));
     }
     /**
      * speaks something to audiences.
@@ -44,7 +49,9 @@ export class Hall<T = void> {
                     return new XjsErr(XjsErrCode.Hall, "couldn't keep up with speakings.");
                 } else throw e;
             });
-            try { await r.cb(d); } finally { r.queues.shift(); }
+            try { await r.cb(d); }
+            catch (e) { this._exceptionHandler(e); }
+            finally { r.queues.shift(); }
         }));
     }
     /**
@@ -60,7 +67,9 @@ export class Hall<T = void> {
         if (this._qidTop > 0) {
             queues.push([this._qidTop, d!]);
             keepUpPrms = (async () => {
-                try { await cb(d!); } finally { queues.shift(); }
+                try { await cb(d!); }
+                catch (e) { this._exceptionHandler(e); }
+                finally { queues.shift(); }
             })();
         } else keepUpPrms = Promise.resolve();
         return { seatNum: this._lidTop, keepUpPrms };
@@ -85,10 +94,11 @@ export class Hall<T = void> {
         }).catch(e => {
             if (e instanceof XjsErr && e.code === 10) throw new XjsErr(XjsErrCode.Hall, "xjs hall break up within speakings.");
             else throw e;
-        }))).finally(() => {
+        }))).finally(async () => {
             this._listener.forEach(r => r.queues.splice(0));
             this._listener.splice(0);
-            return Promise.all(UArray.takeOut(this._cleaners, () => true).map(f => f()));
+            for (const c of this._cleaners.splice(0))
+                try { await c(); } catch (e) { this._exceptionHandler(e); }
         });
     }
     /**
@@ -115,6 +125,7 @@ export class Hall<T = void> {
      * @param op.timeoutMsec timeout milliseconds. default is an hour.
      */
     async awaitBreakingUp(op?: { timeoutMsec?: number }): Promise<void> {
+        if (this._listener.length === 0) return;
         let released = false;
         this.assignCleaner(() => released = true);
         await waitFor(() => released, { timeoutMsec: op?.timeoutMsec ?? toMsec(1, TimeUnit.Hour) }).catch(e => {
