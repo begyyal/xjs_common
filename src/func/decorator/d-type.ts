@@ -17,10 +17,10 @@ export interface TypeDesc {
     /** type description of each value in a record object. */
     rcd?: TypeDesc;
 }
-type BasicTypeDesc = TypeDesc & { ary?: never, obj?: never, rec?: never, rcd?: never };
-type ArrayTypeDesc = TypeDesc & { t?: never, obj?: never, rec?: never, rcd?: never };
-type ClassTypeDesc = TypeDesc & { t?: never, ary?: never, rec?: never, rcd?: never };
-type RecordTypeDesc = TypeDesc & { t?: never, arys?: never, obj?: never, rec?: never };
+type BasicTypeDesc = TypeDesc & { ary?: never, obj?: never, rcd?: never };
+type ArrayTypeDesc = TypeDesc & { t?: never, obj?: never, rcd?: never };
+type ClassTypeDesc = TypeDesc & { t?: never, ary?: never, rcd?: never };
+type RecordTypeDesc = TypeDesc & { t?: never, ary?: never, obj?: never };
 type AnyTypeDesc = BasicTypeDesc | ArrayTypeDesc | ClassTypeDesc | RecordTypeDesc;
 export type TypeMap = Record<string, TypeDesc>;
 /** 
@@ -59,7 +59,7 @@ export namespace DType {
             (td) => UType.isFunction(elmDesc) ? td.ary = { cls: elmDesc } : td.ary = elmDesc);
     }
     /**
-     * expresses a record object. note that this may allow array type because array is essentialy object type has properties. 
+     * expresses a record object. note that this may allows an array type because an array type has essentialy an object type.
      * @param elmDesc {@link TypeDesc} or {@link Ctor|class constructor type}.
      */
     export function record(elmDesc: AnyTypeDesc | Ctor = {}): (target: Object, propKey: string) => void {
